@@ -19,7 +19,6 @@ var a = require('./server/game.js');
 var usernames = {}; //儲存現在有的所有user的name
 var numUsers = 0;   //儲存有多少user
 
-console.log(a.hi());
 
 //如果io現在有connection(連線)那就執行後面的function
 io.on('connection', function (socket) {
