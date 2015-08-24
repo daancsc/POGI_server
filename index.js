@@ -15,54 +15,80 @@ app.use(express.static(__dirname + '/public'));
 
 
 //這邊是自訂的變數
-var game = require('./server/game.js');
+var game = new (require('./server/game.js').game)();
 var usernames = {}; //儲存現有user的name
 var userdatas = {}; //儲存現有user的data
-var numUsers = 0;   //儲存有多少user
 
 
+console.log(game.teams);
+gameLoop();
 //如果io現在有connection(連線)那就執行後面的function
 io.on('connection', function (socket) {
     var addedUser = false;
 
     //有新用戶登入時
     socket.on('add user', function (data) {
+        
+        while(usernames[data.username]==data.username){
+            data.username = 
+                data.username+(Math.floor(Math.random()*99));
+        }
+        
         socket.username = data.username;
+        console.log('add user '+socket.username);
         usernames[data.username] = data.username;
-        ++numUsers;
         addedUser = true;
         
         socket.emit('login', {
-            numUsers: numUsers,
+            name: socket.username,
             teams: game.teams,
             usernames: usernames
         });
         
-        socket.broadcast.emit('user joined', {
+        socket.broadcast.emit('user logined', {
             username: socket.username,
-            numUsers: numUsers
         });
+        
+        console.log(
+            'user '+socket.username+' login');
     });
     
     //有訊息時
     socket.on('join team', function (data) {
         var team = game.joinTeam(data);
         socket.emit('join', {
-            team: team
+            team: team,
+            teams: game.teams,
+            players: game.players
         });
         
         socket.broadcast.emit('new join', {
             username: socket.username,
-            
-            message: data
+            teams: game.teams,
+            players: game.players
         });
+        
+        console.log(
+            'user '+socket.username+' join team '+game.teams[team].name);
     });
     
+    
+    socket.on('update',function (data){
+        if(socket.username == usernames[socket.username]){
+            game.players[socket.username].timeout=200;
+            game.players[socket.username].position = data.position;
+            socket.emit('update', {
+                usernames: usernames,
+                players: game.players,
+                teams: game.teams
+            });
+        }
+    });
     
     //隨便示範一個:
     socket.on('當發生了事件名稱', function (收到了傳入值) {
         
-        socket.emit('發布訊息名稱', { //發布的話所有人都看得到
+        socket.emit('發布訊息名稱', { //不確定耶..抱歉阿
             發布內容項目1: "發布內容項目1中的內容",
             發布內容項目2: "發布內容項目2中的內容",
         });
@@ -78,13 +104,32 @@ io.on('connection', function (socket) {
 
         if (addedUser) {
             delete usernames[socket.username];
-            --numUsers;
             
             
             socket.broadcast.emit('user left', {
                 username: socket.username,
-                numUsers: numUsers
             });
         }
     });
 });
+
+function gameLoop() {
+    game.update();
+    for(i in game.players){
+        game.players[i].update();
+        if(game.players[i].timeout<0) {
+            var username = game.players[i].name;
+            delete usernames[username];
+            delete game.teams[game.players[i].team].playernames[username];
+            delete game.players[i];
+        }
+    }
+    var text='';
+    for(i in game.players){
+        var player = game.players[i];
+        text+= player.name+' '+player.position.x+' , '+player.position.y;
+    }
+    console.log(text);
+    setTimeout(gameLoop, 50);
+    return 0;
+}

@@ -1,0 +1,24 @@
+
+#joinPage {
+    display: none;
+}
+
+#gamePage {
+    display: none;
+}
+
+#gameStatus {
+    display: none;
+}
+
+div {
+    text-align: center ;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    z-index: 10;
+}
+
+#processing {
+    display: none;
+}

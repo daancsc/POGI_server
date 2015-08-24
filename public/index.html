@@ -12,19 +12,43 @@
         <script src="libraries/p5.dom.js" type="text/javascript"></script>
         <script src="libraries/p5.sound.js" type="text/javascript"></script>
         
-        <link rel=stylesheet type="text/css" href="css/style.css"> 
-        
         <script src="js/client.js" type="text/javascript"></script>
         <script src="js/calc.js" type="text/javascript"></script>
         <script src="js/draw.js" type="text/javascript"></script>
         <script src="js/main.js" type="text/javascript"></script>
+        
+        <link rel=stylesheet type="text/css" href="./css/style.css"> 
     </head>
     
     <body onbeforeunload=closing()>
         <h1>this is a test project</h1>
-        <form action="#" onsubmit=named() >
-            enter your name
-            <input id="name" autocomplete="off" />
-        </form>
+        
+        <div id="processing"></div>
+        
+        <div id="loginPage">
+            <form action="#" onsubmit=named() >
+                enter your name
+                <input id="name" autocomplete="off" />
+            </form>
+        </div>
+        
+        <div id="joinPage">
+            <form action="#" onsubmit=joined() >
+                <input type="button" value="JOIN GAME!" onclick=joined() />
+            </form>
+        </div>
+        
+        <div id="gamePage">
+            <p id="me"></p>
+            <p id="users"></p>
+        </div>
+        
+        <div id="gameStatus">
+            <h1>Teams</h1>
+            <p id="team1"></p>
+            <p id="team2"></p>
+            <p id="team3"></p>
+            <p id="team4"></p>
+        </div>
     </body>
 </html>

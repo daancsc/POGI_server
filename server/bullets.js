@@ -1,4 +1,4 @@
-exports.function bullet (team, position, velocity) {
+exports.team = function(team, position, velocity) {
     this.team = team;
     this.position;
     this.velocity;

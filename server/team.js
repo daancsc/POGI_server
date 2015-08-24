@@ -1,14 +1,26 @@
-exports.function team (name, id, color) {
+exports.team = function(name, id, color) {
     this.id = id;
     this.name = name;
     this.color = color;
     
-    this.numPlayer = 0;
     this.score = 0;
     this.playernames = {};
     
-    function join (player) {
-        ++numPlayer;
-        playernames[player.name] = player.name;
+    this.join = function(player) {
+        this.playernames[player.name] = player.name;
+        return false;
     }
+    
+    this.numPlayers = function() {
+        var out = this.playernames.length;
+        if(out == undefined) return 0;
+        return out;
+    }
+    
+    return false;
+}
+
+exports.hi = function() {
+    console.log('hi');
+    return false;
 }
