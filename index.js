@@ -45,8 +45,8 @@ io.on('connection', function (socket) {
             usernames: usernames
         });
         
-        socket.broadcast.emit('user logined', {
-            username: socket.username,
+        socket.broadcast.emit('user login', {
+            teams: game.teams,
         });
         
         console.log(
@@ -56,6 +56,7 @@ io.on('connection', function (socket) {
     //有訊息時
     socket.on('join team', function (data) {
         var team = game.joinTeam(data);
+        
         socket.emit('join', {
             team: team,
             teams: game.teams,
@@ -65,7 +66,7 @@ io.on('connection', function (socket) {
         socket.broadcast.emit('new join', {
             username: socket.username,
             teams: game.teams,
-            players: game.players
+            player: game.players[socket.username]
         });
         
         console.log(
@@ -75,9 +76,13 @@ io.on('connection', function (socket) {
     
     socket.on('update',function (data){
         if(socket.username == usernames[socket.username]){
-            game.players[socket.username].timeout=200;
-            game.players[socket.username].position = data.position;
+            if(data.name!=undefined&&data.position!=undefined){
+                game.players[socket.username].timeout=200;
+                game.players[socket.username].position = data.position;
+            }
+            
             socket.emit('update', {
+                username: socket.username,
                 usernames: usernames,
                 players: game.players,
                 teams: game.teams
@@ -124,12 +129,14 @@ function gameLoop() {
             delete game.players[i];
         }
     }
+    console.log(game.players);
+    /*
     var text='';
     for(i in game.players){
         var player = game.players[i];
         text+= player.name+' '+player.position.x+' , '+player.position.y;
     }
-    console.log(text);
+    console.log(text);*/
     setTimeout(gameLoop, 50);
     return 0;
 }

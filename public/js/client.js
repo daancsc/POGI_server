@@ -8,7 +8,7 @@ var myname = '';
 var myTeam;
 
 var players = [];
-var dplayers = [];
+var pplayers = [];
 
 function named () {
     var text = document.getElementById('name');
@@ -19,7 +19,6 @@ function named () {
 function joined () {
     socket.emit('join team',{
         name: myname,
-        
     });
 }
 
@@ -41,12 +40,18 @@ socket.on('login', function (data){
     document.getElementById('gameStatus').style.display='block';
 });
 
+socket.on('user login', function (data){
+    teams = teams;
+});
+
 socket.on('join', function (data){
     
     myTeam = data.team;
     teams = data.teams;
     players = data.players;
-    dplayers = data.players;
+    //pplayers = data.players;
+    console.log('join');
+    
     
     document.getElementById("me").innerHTML = 
         'Name='+myname+'\n'+
@@ -54,6 +59,7 @@ socket.on('join', function (data){
     
     updateGamepage();
     updateTeamData();
+    
     document.getElementById('joinPage').style.display='none';
     document.getElementById('gamePage').style.display='block';
     document.getElementById('processing').style.display='block';
@@ -63,16 +69,26 @@ socket.on('join', function (data){
 socket.on('new join', function (data){
     usernames[data.username] = data.username;
     teams = data.teams;
-    players = data.players;
+    players[data.username] = data.player;
+    console.log('new user: '+players[data.username].name);
     
     updateGamepage();
     updateTeamData();
 });
 
 socket.on('update', function (data){
+    console.log('updateFrom '+data.username)
     usernames = data.usernames;
-    players = data.players;
-    
+    for(i in data.players){
+        if(data.players[i]!=undefined)
+            players[i] = data.players[i];
+    }
+    if(data.players!=undefined){
+        for(i in players){
+            if(data.players[i]==undefined)
+                delete players[i];
+        }
+    }
     teams = data.teams;
     updateGamepage();
     updateTeamData();
