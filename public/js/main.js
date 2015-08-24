@@ -14,7 +14,7 @@ function setup() {
 
 function draw() {
     if(isJoin) {
-        if(frameCount%6==0){
+        if(frameCount%3==0){
             updateData();
         }
         calc();

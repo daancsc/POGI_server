@@ -129,7 +129,7 @@ function gameLoop() {
             delete game.players[i];
         }
     }
-    console.log(game.players);
+    //console.log(game.players);
     /*
     var text='';
     for(i in game.players){

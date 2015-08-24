@@ -18,16 +18,17 @@ exports.game = function(){
         var avalibleTeams = [];
         var minNumPlayers = 9999;
         for(i in this.teams){ //找到所有最少人數隊伍
-            if(this.teams[i].numPlayers()<=minNumPlayers) {
-                if(this.teams[i].numPlayers()<minNumPlayers)
+            var num = this.teams[i].numPlayers();
+            if(num<=minNumPlayers) {
+                if(num<minNumPlayers){
                     avalibleTeams=[];
-                minNumPlayers=this.teams[i].numPlayers();
-                avalibleTeams.push(i);
+                    minNumPlayers=num;
+                }
+                avalibleTeams[avalibleTeams.length]=i;
             }
         }
         
-        var teamId = avalibleTeams[Math.floor(Math.random(avalibleTeams.length))];
-        console.log(this.teams[i].numPlayers());
+        var teamId = avalibleTeams[Math.floor(Math.random()*avalibleTeams.length)];
         this.teams[teamId].join(data);
         this.players[data.name] = 
             new player(data.name, teamId, {x: 0, y: 0});

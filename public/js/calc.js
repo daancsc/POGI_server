@@ -7,12 +7,10 @@ function calc () {
             continue;
         }
         if(pplayers[i]!=undefined&&players[i]!=undefined){
-            console.log('smooth');
             pplayers[i].position.x += (players[i].position.x-pplayers[i].position.x)*0.2;
             pplayers[i].position.y += (players[i].position.y-pplayers[i].position.y)*0.2;
         }else{
             if(players[i]!=undefined){
-                console.log('nosmooth');
                 pplayers[i]=players[i];
             }else delete pplayers[i];
         }

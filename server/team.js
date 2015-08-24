@@ -12,8 +12,10 @@ exports.team = function(name, id, color) {
     }
     
     this.numPlayers = function() {
-        var out = this.playernames.length;
-        if(out == undefined) return 0;
+        var out = 0;
+        for(i in this.playernames){
+            out++;
+        }
         return out;
     }
     

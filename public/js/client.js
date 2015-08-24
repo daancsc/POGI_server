@@ -77,7 +77,6 @@ socket.on('new join', function (data){
 });
 
 socket.on('update', function (data){
-    console.log('updateFrom '+data.username)
     usernames = data.usernames;
     for(i in data.players){
         if(data.players[i]!=undefined)
