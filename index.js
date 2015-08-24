@@ -15,8 +15,9 @@ app.use(express.static(__dirname + '/public'));
 
 
 //這邊是自訂的變數
-var a = require('./server/game.js');
-var usernames = {}; //儲存現在有的所有user的name
+var game = require('./server/game.js');
+var usernames = {}; //儲存現有user的name
+var userdatas = {}; //儲存現有user的data
 var numUsers = 0;   //儲存有多少user
 
 
@@ -25,14 +26,18 @@ io.on('connection', function (socket) {
     var addedUser = false;
 
     //有新用戶登入時
-    socket.on('add user', function (username) {
-        socket.username = username;
-        usernames[username] = username;
+    socket.on('add user', function (data) {
+        socket.username = data.username;
+        usernames[data.username] = data.username;
         ++numUsers;
         addedUser = true;
+        
         socket.emit('login', {
-            numUsers: numUsers
+            numUsers: numUsers,
+            teams: game.teams,
+            usernames: usernames
         });
+        
         socket.broadcast.emit('user joined', {
             username: socket.username,
             numUsers: numUsers
@@ -40,14 +45,20 @@ io.on('connection', function (socket) {
     });
     
     //有訊息時
-    socket.on('new message', function (data) {
-        socket.broadcast.emit('new message', {
+    socket.on('join team', function (data) {
+        var team = game.joinTeam(data);
+        socket.emit('join', {
+            team: team
+        });
+        
+        socket.broadcast.emit('new join', {
             username: socket.username,
+            
             message: data
         });
     });
-
-
+    
+    
     //隨便示範一個:
     socket.on('當發生了事件名稱', function (收到了傳入值) {
         
@@ -61,15 +72,15 @@ io.on('connection', function (socket) {
             廣播內容項目2: "廣播內容項目2中的內容",
         });
     });
-
-
+    
+    
     socket.on('disconnect', function () {
 
         if (addedUser) {
             delete usernames[socket.username];
             --numUsers;
-
-
+            
+            
             socket.broadcast.emit('user left', {
                 username: socket.username,
                 numUsers: numUsers
