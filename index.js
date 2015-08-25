@@ -60,7 +60,9 @@ io.on('connection', function (socket) {
         socket.emit('join', {
             team: team,
             teams: game.teams,
-            players: game.players
+            players: game.players,
+            bullets: game.bullets,
+            bases: game.bases
         });
         
         socket.broadcast.emit('new join', {
@@ -76,21 +78,40 @@ io.on('connection', function (socket) {
     
     socket.on('update',function (data){
         if(socket.username == usernames[socket.username]){
-            if(data.name!=undefined&&data.position!=undefined){
+            if(data.name!=undefined&&data.position!=undefined&&game.players[socket.username]!=undefined){
                 game.players[socket.username].timeout=200;
-                game.players[socket.username].position = data.position;
+                game.players[socket.username].velocity = data.velocity;
             }
             
             socket.emit('update', {
                 username: socket.username,
                 usernames: usernames,
                 players: game.players,
-                teams: game.teams
+                teams: game.teams,
+                bullets: game.bullets,
+                bases: game.bases
             });
         }
     });
     
+    socket.on('new bullet', function (data) {
+        game.addBullet(game.players[socket.username].team, data.position, data.velocity);
+    });
+    
     //隨便示範一個:
+    socket.on('new message', function (data) {
+        
+        socket.emit('new message', { //不確定耶..抱歉阿
+            name: socket.username,
+            message: data.message,
+        });
+        
+        socket.broadcast.emit('new message', { //廣播的話反而是所有人看到自己看不到
+            name: socket.username,
+            message: data.message,
+        });
+    });
+    
     socket.on('當發生了事件名稱', function (收到了傳入值) {
         
         socket.emit('發布訊息名稱', { //不確定耶..抱歉阿
@@ -110,7 +131,6 @@ io.on('connection', function (socket) {
         if (addedUser) {
             delete usernames[socket.username];
             
-            
             socket.broadcast.emit('user left', {
                 username: socket.username,
             });
@@ -121,7 +141,6 @@ io.on('connection', function (socket) {
 function gameLoop() {
     game.update();
     for(i in game.players){
-        game.players[i].update();
         if(game.players[i].timeout<0) {
             var username = game.players[i].name;
             delete usernames[username];
@@ -137,6 +156,6 @@ function gameLoop() {
         text+= player.name+' '+player.position.x+' , '+player.position.y;
     }
     console.log(text);*/
-    setTimeout(gameLoop, 50);
+    setTimeout(gameLoop, 10);
     return 0;
 }
