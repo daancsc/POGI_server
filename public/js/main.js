@@ -32,7 +32,7 @@ function draw() {
             text('AUTO LOGOUT',20,20);
         }
         coldTime--;
-        if(mousepressed &&coldTime<0){
+        if(mousepressed &&coldTime<0||what==10&&mousepressed){
             if(myname=='火柴最神') coldTime=3;
             else coldTime=10;
             var dx = mouseX - c(players[myname].position).x;
