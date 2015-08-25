@@ -1,17 +1,17 @@
 var ids = 0;
 exports.bullet = function(team, position, velocity) {
-    ids++;
+    ids=(ids+1)%1000;
     this.id = ids;
     this.team = team;
     this.position = position;
     this.velocity = velocity;
     this.size = 20;
-    this.life = 100;
+    this.life = 300;
     
     this.update = function() {
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
-        this.life-=0.2;
+        this.life-=1;
         return false;
     }
     

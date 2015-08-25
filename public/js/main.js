@@ -14,6 +14,7 @@ function setup() {
     canvas=createCanvas(innerWidth*0.9, innerHeight*0.8);
     canvas.parent('processing');
     //canvas.attribute("align", "center");
+    frameRate(60);
 }
 
 function draw() {

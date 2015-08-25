@@ -19,10 +19,10 @@ exports.game = function(){
     ];
     
     this.teams = [
-        new team('草莓口味',0,'#e62d2d'),
-        new team('香蕉口味',1,'#ffce00'),
-        new team('哈密瓜口味',2,'#48f71e'),
-        new team('茄子口味',3,'#1ebaff')
+        new team('P',0,'#e62d2d'),
+        new team('O',1,'#ffce00'),
+        new team('G',2,'#48f71e'),
+        new team('I',3,'#1ebaff')
     ];
     
     this.getTeams = function(){
@@ -108,6 +108,28 @@ exports.game = function(){
     this.addBase = function (team, position, size) {
         var newBase = new base(team, position, size);
         this.bases[this.bases.length] = newBase;
+    }
+    
+    this.reset = function(){
+        this.bullets = [];
+        this.bases = [
+            new base(0 ,{x: 1000, y: 1000},400),
+            new base(1 ,{x: -1000, y: -1000},400),
+            new base(2 ,{x: 1000, y: -1000},400),
+            new base(3 ,{x: -1000, y: 1000},400),
+
+            new base(-1 ,{x: 200, y: 200},300),
+            new base(-1 ,{x: -200, y: -200},300),
+            new base(-1 ,{x: -200, y: 200},300),
+            new base(-1 ,{x: 200, y: -200},300),
+        ];
+
+        this.teams = [
+            new team('P',0,'#e62d2d'),
+            new team('O',1,'#ffce00'),
+            new team('G',2,'#48f71e'),
+            new team('I',3,'#1ebaff')
+        ];
     }
     
     return false;

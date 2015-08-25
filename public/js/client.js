@@ -46,7 +46,6 @@ function chat () {
     socket.emit('new message',{message: text.value});
     text.value = '';
 }
-
 socket.on('login', function (data){
     myname = data.name;
     teams = data.teams;

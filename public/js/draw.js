@@ -58,8 +58,11 @@ function display(object,pobject){
             
             textSize(cs(object[i].size*0.2));
             fill(255);
-            if(object[i].coldTime!=undefined&&object[i].team!=undefined&&teams[object[i].team]!=undefined)
+            if(object[i].coldTime!=undefined&&object[i].team!=undefined&&teams[object[i].team]!=undefined){
                 text(teams[object[i].team].name,c(pobject[i].position).x,c(pobject[i].position).y);
+                textSize(cs(object[i].size*0.1));
+                text('\n\n'+object[i].size,c(pobject[i].position).x,c(pobject[i].position).y);
+            }
         }
     }
 }

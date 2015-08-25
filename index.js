@@ -100,16 +100,30 @@ io.on('connection', function (socket) {
     
     //隨便示範一個:
     socket.on('new message', function (data) {
-        
-        socket.emit('new message', { //不確定耶..抱歉阿
-            name: socket.username,
-            message: data.message,
-        });
-        
-        socket.broadcast.emit('new message', { //廣播的話反而是所有人看到自己看不到
-            name: socket.username,
-            message: data.message,
-        });
+        if(data.message[0]=='/'){
+            if(data.message=='/reset') game.reset();
+            if(data.message=='/say') {
+                socket.emit('new message', { //不確定耶..抱歉阿
+                    name: '!POGIserver! ：',
+                    message: data.message.substring(4),
+                });
+
+                socket.broadcast.emit('new message', { //廣播的話反而是所有人看到自己看不到
+                    name: '!POGIserver]! ：',
+                    message: data.message.substring(4),
+                });
+            }
+        }else{
+            socket.emit('new message', { //不確定耶..抱歉阿
+                name: socket.username,
+                message: data.message,
+            });
+
+            socket.broadcast.emit('new message', { //廣播的話反而是所有人看到自己看不到
+                name: socket.username,
+                message: data.message,
+            });
+        }
     });
     
     socket.on('當發生了事件名稱', function (收到了傳入值) {
@@ -156,6 +170,6 @@ function gameLoop() {
         text+= player.name+' '+player.position.x+' , '+player.position.y;
     }
     console.log(text);*/
-    setTimeout(gameLoop, 10);
+    setTimeout(gameLoop, 16.6);
     return 0;
 }
