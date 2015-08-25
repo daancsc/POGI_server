@@ -3,6 +3,8 @@ var bullet = require('./bullets.js').bullet;
 var base = require('./base.js').base;
 var team = require('./team.js').team;
 
+
+
 exports.game = function(){
     this.players = {};
     this.bullets = [];
@@ -51,9 +53,6 @@ exports.game = function(){
     }
     
     this.update = function(){
-        for(i in this.players){
-            this.players[i].update();
-        }
         for(i in this.bullets) {
             for(j in this.bullets) {
                 if(i!=j){
@@ -95,6 +94,10 @@ exports.game = function(){
             for(j in this.bases) if(i!=j) if(this.bases[i].findTarget(this.bases[j]));
             var shoot = this.bases[i].shoot();
             if(shoot.shoot) this.addBullet(shoot.team, shoot.position, shoot.velocity);
+        }
+        
+        for(i in this.players){
+            this.players[i].update();
         }
         return false;
     }
