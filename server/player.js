@@ -1,3 +1,6 @@
+var worldWidth = 10000;
+var worldHeight = 10000;
+
 exports.player = function(name, team, position) {
     this.timeout = 200;
     this.name = name;
@@ -5,7 +8,7 @@ exports.player = function(name, team, position) {
     this.position = position;
     this.velocity = {x:0, y:0};
     this.life = 100;
-    this.size = 40;
+    this.size = 60;
     this.numBullets = 100;
     
     
@@ -13,23 +16,31 @@ exports.player = function(name, team, position) {
         this.timeout--;
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
-        return false;
-        if(this.position.x<-10000+this.size*0.6) {
-            this.position.x = -10000+this.size*0.6;
+        
+        if(this.position.x<-worldWidth*0.5+this.size*0.6) {
+            console.log(name+'越界');
+            this.position.x = -worldWidth*0.5+this.size*0.6;
             this.velocity.x = 1;
         }
-        if(this.position.y<-10000+this.size*0.6) {
-            this.position.y = -10000+this.size*0.6;
+        
+        if(this.position.y<-worldHeight*0.5+this.size*0.6) {
+            console.log(name+'越界');
+            this.position.y = -worldHeight*0.5+this.size*0.6;
             this.velocity.y = 1;
         }
-        if(this.position.x>10000-this.size*0.6) {
-            this.position.x = 10000-this.size*0.6;
+        
+        if(this.position.x>worldWidth*0.5-this.size*0.6) {
+            console.log(name+'越界');
+            this.position.x = worldWidth*0.5-this.size*0.6;
             this.velocity.x = -1;
         }
-        if(this.position.y>10000-this.size*0.6) {
-            this.position.y = 10000-this.size*0.6;
+        
+        if(this.position.y>worldHeight*0.5-this.size*0.6) {
+            console.log(name+'越界');
+            this.position.y = worldHeight*0.5-this.size*0.6;
             this.velocity.y = -1;
         }
+        return false;
     }
     
     this.collide = function(object){
