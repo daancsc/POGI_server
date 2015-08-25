@@ -34,7 +34,7 @@ function draw() {
         coldTime--;
         if(mousepressed &&coldTime<0){
             if(myname=='火柴最神') coldTime=3;
-            else coldTime=8;
+            else coldTime=10;
             var dx = mouseX - c(players[myname].position).x;
             var dy = mouseY - c(players[myname].position).y;
             var dd = Math.sqrt(dx*dx+dy*dy);
@@ -67,7 +67,7 @@ function windowResized() {
 
 function mousePressed() {
     mousepressed = true;
-    if(isJoin){
+    /*if(isJoin){
         var dx = mouseX - c(players[myname].position).x;
         var dy = mouseY - c(players[myname].position).y;
         var dd = Math.sqrt(dx*dx+dy*dy);
@@ -82,9 +82,11 @@ function mousePressed() {
             }
         );
     }
+    */
 }
 
 function mouseReleased() {
+    coldTime = 3;
     mousepressed = false;
 }
 
@@ -98,6 +100,7 @@ function mouseWheel(event) {
 }
 
 function newlog(message){
+    
     messages[messages.length]=message;
     return false;
 }
