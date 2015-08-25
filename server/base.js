@@ -1,6 +1,9 @@
 var ids = 0;
 var targets = [];
 var ama = 2;
+
+var worldWidth = 10000;
+var worldHeight = 10000;
 exports.base = function(team, position, size) {
     ids++;
     this.id = ids;
@@ -16,6 +19,25 @@ exports.base = function(team, position, size) {
         this.position.x += this.velocity.x*=0.9;
         this.position.y += this.velocity.y*=0.9;
         
+        if(this.position.x<-worldWidth*0.5+this.size*0.6) {
+            this.position.x = -worldWidth*0.5+this.size*0.6;
+            this.velocity.x = 1;
+        }
+        
+        if(this.position.y<-worldHeight*0.5+this.size*0.6) {
+            this.position.y = -worldHeight*0.5+this.size*0.6;
+            this.velocity.y = 1;
+        }
+        
+        if(this.position.x>worldWidth*0.5-this.size*0.6) {
+            this.position.x = worldWidth*0.5-this.size*0.6;
+            this.velocity.x = -1;
+        }
+        
+        if(this.position.y>worldHeight*0.5-this.size*0.6) {
+            this.position.y = worldHeight*0.5-this.size*0.6;
+            this.velocity.y = -1;
+        }
         return false;
     }
     
