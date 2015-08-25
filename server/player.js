@@ -18,25 +18,21 @@ exports.player = function(name, team, position) {
         this.position.y += this.velocity.y;
         
         if(this.position.x<-worldWidth*0.5+this.size*0.6) {
-            console.log(name+'越界');
             this.position.x = -worldWidth*0.5+this.size*0.6;
             this.velocity.x = 1;
         }
         
         if(this.position.y<-worldHeight*0.5+this.size*0.6) {
-            console.log(name+'越界');
             this.position.y = -worldHeight*0.5+this.size*0.6;
             this.velocity.y = 1;
         }
         
         if(this.position.x>worldWidth*0.5-this.size*0.6) {
-            console.log(name+'越界');
             this.position.x = worldWidth*0.5-this.size*0.6;
             this.velocity.x = -1;
         }
         
         if(this.position.y>worldHeight*0.5-this.size*0.6) {
-            console.log(name+'越界');
             this.position.y = worldHeight*0.5-this.size*0.6;
             this.velocity.y = -1;
         }
