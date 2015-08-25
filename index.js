@@ -102,25 +102,25 @@ io.on('connection', function (socket) {
     socket.on('new message', function (data) {
         if(data.message[0]=='/'){
             if(data.message=='/reset') game.reset();
-            if(data.message=='/say') {
-                socket.emit('new message', { //不確定耶..抱歉阿
-                    name: '!POGIserver! ：',
-                    message: data.message.substring(4),
+            if(data.message.substring(0,4)=='/say') {
+                socket.emit('new message', { 
+                    name: '[POGI_SERVER]',
+                    message: data.message.substring(4)
                 });
 
-                socket.broadcast.emit('new message', { //廣播的話反而是所有人看到自己看不到
-                    name: '!POGIserver]! ：',
-                    message: data.message.substring(4),
+                socket.broadcast.emit('new message', {
+                    name: '[POGI_SERVER]',
+                    message: data.message.substring(4)
                 });
             }
         }else{
-            socket.emit('new message', { //不確定耶..抱歉阿
-                name: socket.username,
+            socket.emit('new message', { 
+                name: ' '+socket.username,
                 message: data.message,
             });
 
-            socket.broadcast.emit('new message', { //廣播的話反而是所有人看到自己看不到
-                name: socket.username,
+            socket.broadcast.emit('new message', { 
+                name: ' '+socket.username,
                 message: data.message,
             });
         }

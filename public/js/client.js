@@ -100,7 +100,7 @@ socket.on('new join', function (data){
 });
 
 socket.on('new message', function (data){
-    newlog('['+data.name+']： '+data.message);
+    newlog(data.name +'： '+data.message);
 });
 
 socket.on('update', function (data){

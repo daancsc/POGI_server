@@ -7,15 +7,15 @@ exports.game = function(){
     this.players = {};
     this.bullets = [];
     this.bases = [
-        new base(0 ,{x: 1000, y: 1000},400),
-        new base(1 ,{x: -1000, y: -1000},400),
-        new base(2 ,{x: 1000, y: -1000},400),
-        new base(3 ,{x: -1000, y: 1000},400),
+        new base(0 ,{x: 1500, y: 1500},500),
+        new base(1 ,{x: -1500, y: -1500},500),
+        new base(2 ,{x: 1500, y: -1500},500),
+        new base(3 ,{x: -1500, y: 1500},500),
         
-        new base(-1 ,{x: 200, y: 200},300),
-        new base(-1 ,{x: -200, y: -200},300),
-        new base(-1 ,{x: -200, y: 200},300),
-        new base(-1 ,{x: 200, y: -200},300),
+        new base(-1 ,{x: 700, y: 500},200),
+        new base(-1 ,{x: -700, y: -500},200),
+        new base(-1 ,{x: -700, y: 500},200),
+        new base(-1 ,{x: 700, y: -500},200),
     ];
     
     this.teams = [
@@ -113,15 +113,15 @@ exports.game = function(){
     this.reset = function(){
         this.bullets = [];
         this.bases = [
-            new base(0 ,{x: 1000, y: 1000},400),
-            new base(1 ,{x: -1000, y: -1000},400),
-            new base(2 ,{x: 1000, y: -1000},400),
-            new base(3 ,{x: -1000, y: 1000},400),
+            new base(0 ,{x: 1500, y: 1500},500),
+            new base(1 ,{x: -1500, y: -1500},500),
+            new base(2 ,{x: 1500, y: -1500},500),
+            new base(3 ,{x: -1500, y: 1500},500),
 
-            new base(-1 ,{x: 200, y: 200},300),
-            new base(-1 ,{x: -200, y: -200},300),
-            new base(-1 ,{x: -200, y: 200},300),
-            new base(-1 ,{x: 200, y: -200},300),
+            new base(-1 ,{x: 700, y: 500},200),
+            new base(-1 ,{x: -700, y: -500},200),
+            new base(-1 ,{x: -700, y: 500},200),
+            new base(-1 ,{x: 700, y: -500},200),
         ];
 
         this.teams = [

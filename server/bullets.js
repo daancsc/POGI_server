@@ -6,7 +6,7 @@ exports.bullet = function(team, position, velocity) {
     this.position = position;
     this.velocity = velocity;
     this.size = 20;
-    this.life = 300;
+    this.life = 200;
     
     this.update = function() {
         this.position.x += this.velocity.x;

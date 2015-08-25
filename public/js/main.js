@@ -92,7 +92,7 @@ function mouseWheel(event) {
     //event.delta can be +1 or -1 depending
     //on the wheel/scroll direction
     //move the square one pixel up or down
-    if(0.2<camera.ts+event.delta*0.02&&camera.ts+event.delta*0.02<2)camera.ts+= event.delta*0.02;
+    if(0.1<camera.ts+event.delta*0.02&&camera.ts+event.delta*0.02<2)camera.ts+= event.delta*0.02;
     //uncomment to block page scrolling
     //return false;
 }

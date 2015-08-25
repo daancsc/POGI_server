@@ -1,6 +1,6 @@
 var ids = 0;
 var targets = [];
-var ama = 3;
+var ama = 2;
 exports.base = function(team, position, size) {
     ids++;
     this.id = ids;
@@ -55,7 +55,7 @@ exports.base = function(team, position, size) {
                 var dx= target.position.x-this.position.x;
                 var dy= target.position.y-this.position.y;
                 var dd= Math.sqrt(dx*dx+dy*dy);
-                this.coldTime = 100+3000/this.size;
+                this.coldTime = 100+2000/this.size;
                 return {
                     shoot: true,
                     team: this.team,
@@ -79,8 +79,8 @@ exports.base = function(team, position, size) {
                 x: object.position.x-this.position.x,
                 y: object.position.y-this.position.y
             }
-            if(Math.abs(distance.x)<this.size*3&&Math.abs(distance.y)<this.size*3){
-                if((distance.x*distance.x+distance.y*distance.y)<this.size*this.size*3*3){
+            if(Math.abs(distance.x)<this.size*2&&Math.abs(distance.y)<this.size*2){
+                if((distance.x*distance.x+distance.y*distance.y)<this.size*this.size*2*2){
                     
                     targets[targets.length] = object;
                     return true;

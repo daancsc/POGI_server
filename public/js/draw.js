@@ -4,7 +4,7 @@ var camera = {
         y: 0,
     },
     s: 0.2,
-    ts: 1
+    ts: 0.6
 }
 
 function render () {
@@ -21,11 +21,11 @@ function render () {
     text('This is a great game call POGI !\n'+
          '>> use your mouse to move\n'+
          'hold or click to shot!!\n\n'+
-         'Be happy with this game!\n\n'+
          '大安高工電腦研究社\n'+
          'DACSC\n'+
          '2018/08/25\n'+
-         'by -強大的美宣-火柴',c({x:0}).x,c({y:500}).y);
+         '                          -by 火柴\n\n'+
+         '現在時間：'+year()+'/'+month()+'/'+day()+'\n'+hour()+'：'+minute()+'：'+second(),c({x:0}).x,c({y:500}).y);
     
     textAlign(CENTER,BOTTOM);
     textSize(cs(100));
