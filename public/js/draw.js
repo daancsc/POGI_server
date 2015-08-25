@@ -79,3 +79,37 @@ function c(position){
 function cs(s){
     return s*camera.s;
 }
+var what = 0;
+function keyPressed(){
+    switch(keyCode){
+        case UP_ARROW:
+            if(what==0) what = 1;
+            else if(what==1) what = 2;
+            else what = 0;
+            break;
+        case DOWN_ARROW:
+            if(what==2) what = 3;
+            else if(what==3) what = 4;
+            else what = 0;
+            break;
+        case LEFT_ARROW:
+            if(what==4) what = 5;
+            else if(what==6) what = 7;
+            else what = 0;
+            break;
+        case RIGHT_ARROW:
+            if(what==5) what = 6;
+            else if(what==7) what = 8;
+            else what = 0;
+            break;
+        case 66:
+            if(what==8) what = 9;
+            else what = 0;
+            break;
+        case 65:
+            if(what==9) what = 10;
+            else what = 0;
+            break;
+    }
+    console.log(keyCode+' '+what);
+}
