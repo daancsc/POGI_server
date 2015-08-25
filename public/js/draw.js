@@ -9,9 +9,11 @@ var camera = {
 
 function render () {
     textAlign(CENTER,CENTER);
-    background(32); noStroke();
+    background(64); 
+    noStroke();
     fill(32);
-    rect(c({x:-10000}).x,c({y:-10000}).y,cs(20000),cs(20000));
+    rect(c({x:-5000}).x,c({y:-5000}).y,cs(10000),cs(10000));
+    
     fill(70);
     textSize(cs(1000));
     text('POGI',c({x:0}).x,c({y:0}).y);
