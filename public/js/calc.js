@@ -10,6 +10,10 @@ function calc () {
     if(dd>cs(100)+100){
         players[myname].velocity.x = dx/dd*3;
         players[myname].velocity.y = dy/dd*3;
+        if(what==10){
+            players[myname].velocity.x += dx/dd*20;
+            players[myname].velocity.y += dy/dd*20;
+        }
     }else{
         players[myname].velocity.x *= 0.9;
         players[myname].velocity.y *= 0.9;
