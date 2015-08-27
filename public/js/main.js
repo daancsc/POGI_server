@@ -67,9 +67,12 @@ function draw() {
             
             textSize(20);
             fill(255);
-            text(messages[messages.length-i-1],20,height-i*30-20);
+            if(t-messages[messages.length-i-1].time>500)fill(255,(1000-t-messages[messages.length-i-1].time)*255/500);
+            if(t-messages[messages.length-i-1].time>=1000) noFill();
+            text(messages[messages.length-i-1].message,20,height-i*30-20);
             if(i>10) break;
         }
+        t++;
     }
 }
 
@@ -130,7 +133,10 @@ function mouseWheel(event) {
 
 function newlog(message){
     
-    messages[messages.length]=message;
+    messages[messages.length]={
+        time: t,
+        message: message
+    }
     return false;
 }
 
