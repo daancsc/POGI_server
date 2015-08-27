@@ -28,7 +28,7 @@ exports.player = function(name, team, position, AI) {
     
     this.update = function(){       
         
-        if(!this.AI)this.timeout++;
+        if(this.AI!==true)this.timeout++;
         this.position.x += this.velocity.x; this.positionChanged = true;
         this.position.y += this.velocity.y;
         
@@ -79,13 +79,13 @@ exports.player = function(name, team, position, AI) {
                     if(object.team==-1){ this.numBullets+=object.size/4; sizeChanged=true; numBulletsChanged=true; }
                     else if(object.team==this.team&&object.life<180) {
                         this.numBullets+=1; this.sizeChanged=true; this.numBulletsChanged=true;
-                        this.velocity.x += object.velocity.x/this.size*0.1*object.size; velocityChanged = true;
-                        this.velocity.y += object.velocity.y/this.size*0.1*object.size;
+                        this.velocity.x += object.velocity.x/this.size*0.01*object.size; velocityChanged = true;
+                        this.velocity.y += object.velocity.y/this.size*0.01*object.size;
                     }
                     else if(object.team!=this.team&&this.numBullets>0) {
                         this.numBullets-=object.size/4; this.sizeChanged=true; this.numBulletsChanged=true;
-                        this.velocity.x += object.velocity.x/this.size*5*object.size; velocityChanged = true;
-                        this.velocity.y += object.velocity.y/this.size*5*object.size;
+                        this.velocity.x += object.velocity.x/this.size*object.size; velocityChanged = true;
+                        this.velocity.y += object.velocity.y/this.size*object.size;
                     }
                     if(!(object.team==this.team&&object.life>=180)) object.life = 0;
                 }
@@ -114,6 +114,7 @@ exports.player = function(name, team, position, AI) {
     
     this.setPing = function(){
         this.ping = this.timeout;
+        this.timeout = 0;
         return false;
     }
     
@@ -150,7 +151,8 @@ exports.player = function(name, team, position, AI) {
             size: simSize,
             position: simPosition,
             velocity: simVelocity,
-            numBullets: simNumBullets
+            numBullets: simNumBullets,
+            ping: this.ping
         };
     }
     

@@ -86,6 +86,7 @@ exports.bullet = function(team, position, velocity, life, size) {
         var simSize = undefined;
         var simPosition = undefined;
         var simVelocity = undefined;
+        if(Math.random()<0.6)this.positionChanged = this.velocityChanged;
         if(this.teamChanged) simTeam = this.team;
         if(this.sizeChanged)simSize = Math.round(this.size);
         if(this.positionChanged)simPosition = {

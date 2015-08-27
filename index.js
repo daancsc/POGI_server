@@ -65,7 +65,7 @@ function addAI(name){
     });
 }
 
-for(var i=0;i<30;i++){
+for(var i=0;i<0;i++){
     addAI(AInames[Math.floor(Math.random()*AInames.length)]);
 }
 
@@ -127,7 +127,8 @@ io.on('connection', function (socket) {
         if(socket.username == usernames[socket.username]){
             if(data.name!=undefined&&data.position!=undefined&&game.players[socket.username]!=undefined){
                 game.players[socket.username].setPing();
-                game.players[socket.username].timeout=0;/*
+                //game.players[socket.username].timeout=0;
+                /*
                 if(game.players[socket.username].ping>2){
                     var dx = data.position.x-game.players[socket.username].position.x;
                     var dy = data.position.y-game.players[socket.username].position.y;
@@ -266,7 +267,7 @@ function gameLoop() {
     
     
     
-    if(tick%5==0){
+    if(tick%3==0){
         io.sockets.emit('update', game.simData());
     }
     //console.log(game.players);
@@ -277,6 +278,6 @@ function gameLoop() {
         text+= player.name+' '+player.position.x+' , '+player.position.y;
     }
     console.log(text);*/
-    setTimeout(gameLoop, 10);
+    setTimeout(gameLoop, 15);
     return 0;
 }

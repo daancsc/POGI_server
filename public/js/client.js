@@ -120,6 +120,7 @@ socket.on('update', function (data){
                 };
             }
             if(data.players[i]!=undefined){
+                if(data.players[i].ping!=undefined)players[i].ping = data.players[i].ping;
                 if(data.players[i].team!=undefined)players[i].team = data.players[i].team;
                 if(data.players[i].size!=undefined)players[i].size = data.players[i].size;
                 if(data.players[i].position!=undefined)players[i].position = data.players[i].position;

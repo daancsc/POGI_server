@@ -58,7 +58,9 @@ var animated = function(object,pobject){
 var movingUpdate = function(player){
     player.position.x += player.velocity.x;
     player.position.y += player.velocity.y;
+    if(player.type!='bullet'){
         player.velocity.x*=0.98;
         player.velocity.y*=0.98;
+    }
     return player;
 }

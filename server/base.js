@@ -24,6 +24,7 @@ exports.base = function(team, position, size) {
     this.coldTime = 100;
     this.foodTime = 500;
     this.border = false;
+    this.lastSize = 100;
     
     this.update = function() {
         this.coldTime--;
@@ -177,6 +178,9 @@ exports.base = function(team, position, size) {
         var simSize = undefined;
         var simPosition = undefined;
         var simVelocity = undefined;
+        if(Math.abs(this.lastSize-this.size)>10) this.sizeChanged = true;
+        this.lastSize = this.size;
+        if(Math.random()<0.6)this.positionChanged = this.velocityChanged;
         if(this.teamChanged) simTeam = this.team;
         if(this.sizeChanged)simSize = Math.round(this.size);
         if(this.positionChanged)simPosition = {
