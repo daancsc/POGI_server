@@ -67,8 +67,8 @@ function draw() {
             
             textSize(20);
             fill(255);
-            if(t-messages[messages.length-i-1].time>500)fill(255,(1000-t-messages[messages.length-i-1].time)*255/500);
-            if(t-messages[messages.length-i-1].time>=1000) noFill();
+            if(t-messages[messages.length-i-1].time>1000)fill(255,(2000-t-messages[messages.length-i-1].time)*255/1000);
+            if(t-messages[messages.length-i-1].time>=2000) noFill(); 
             text(messages[messages.length-i-1].message,20,height-i*30-20);
             if(i>10) break;
         }
