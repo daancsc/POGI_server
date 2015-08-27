@@ -3,7 +3,8 @@ var t=0;
 var isJoin = false;
 var mousepressed = false;
 var coldTime = 5;
-
+var updateSpeed = 3;
+var lastPing = 0;
 var messages = [];
 
 function closing (){
@@ -11,16 +12,24 @@ function closing (){
 }
 
 function setup() {
-    canvas=createCanvas(innerWidth*0.9, innerHeight*0.8);
+    canvas=createCanvas(innerWidth*0.98, innerHeight*0.87);
     canvas.parent('processing');
     //canvas.attribute("align", "center");
     frameRate(60);
 }
 
+function windowResized() {
+    resizeCanvas(innerWidth*0.98, innerHeight*0.87);
+}
+
 function draw() {
     if(isJoin) {
+        
         if(frameCount%3==0){
             updateData();
+            if(players[myname].ping>lastPing+1&&updateSpeed+1<20) updateSpeed++;
+            else if(players[myname].ping<lastPing-1&&updateSpeed-1>3) updateSpeed--;
+            lastPing=players[myname].ping;
         }
         calc();
         render();
@@ -32,23 +41,26 @@ function draw() {
             text('AUTO LOGOUT',20,20);
         }
         coldTime--;
-        if(mousepressed &&coldTime<0||what==10&&mousepressed){
+        if((mousepressed||presskey[32]) &&coldTime<0){
             if(myname=='火柴最神') coldTime=3;
             else coldTime=10;
-            var dx = mouseX - c(players[myname].position).x;
-            var dy = mouseY - c(players[myname].position).y;
-            var dd = Math.sqrt(dx*dx+dy*dy);
             
-            addBullet(
-                {
-                    x: players[myname].position.x,
-                    y: players[myname].position.y
-                },
-                {
-                    x: dx/dd*20,
-                    y: dy/dd*20
-                }
-            );
+            if(what==10){
+                createBullet({
+                    x: players[myname].position.x + Math.random()*players[myname].size*0.3,
+                    y: players[myname].position.y + Math.random()*players[myname].size*0.3
+                },{
+                    x: dc({x:mouseX}).x,
+                    y: dc({y:mouseY}).y
+                }, 50);
+                coldTime=5;
+            }else{
+                createBullet(players[myname].position,{
+                    x: dc({x:mouseX}).x,
+                    y: dc({y:mouseY}).y
+                }, 40);
+            }
+            
         }
         textAlign(LEFT,BOTTOM);
         for(i in messages){
@@ -61,9 +73,26 @@ function draw() {
     }
 }
 
-function windowResized() {
-    resizeCanvas(innerWidth*0.9, innerHeight*0.8);
+function createBullet(from, to, speed){
+    if(players[myname].numBullets>0){
+        var dx = to.x - from.x;
+        var dy = to.y - from.y;
+        var dd = Math.sqrt(dx*dx+dy*dy);
+        addBullet(
+            {
+                x: from.x + dx/dd * players[myname].size*0.6,
+                y: from.y + dy/dd * players[myname].size*0.6
+            },
+            {
+                x: dx/dd*speed,
+                y: dy/dd*speed
+            }
+        );
+    }
+    return false;
 }
+
+
 
 function mousePressed() {
     mousepressed = true;
@@ -103,4 +132,33 @@ function newlog(message){
     
     messages[messages.length]=message;
     return false;
+}
+
+
+
+/***********************************************
+* Disable select-text script- © Dynamic Drive (www.dynamicdrive.com)
+* This notice MUST stay intact for legal use
+* Visit http://www.dynamicdrive.com/ for full source code
+***********************************************/
+
+//form tags to omit in NS6+:
+var omitformtags=["input", "textarea", "select"]
+
+omitformtags=omitformtags.join("|")
+
+function disableselect(e){
+if (omitformtags.indexOf(e.target.tagName.toLowerCase())==-1)
+return false
+}
+
+function reEnable(){
+return true
+}
+
+if (typeof document.onselectstart!="undefined")
+document.onselectstart=new Function ("return false")
+else{
+document.onmousedown=disableselect
+document.onmouseup=reEnable
 }

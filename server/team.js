@@ -1,4 +1,8 @@
+
+
 exports.team = function(name, id, color) {
+    this.playernamesChanged = false;
+    
     this.id = id;
     this.name = name;
     this.color = color;
@@ -7,6 +11,7 @@ exports.team = function(name, id, color) {
     this.playernames = {};
     
     this.join = function(player) {
+        this.playernamesChanged = true;
         this.playernames[player.name] = player.name;
         return false;
     }
@@ -19,10 +24,16 @@ exports.team = function(name, id, color) {
         return out;
     }
     
-    return false;
-}
-
-exports.hi = function() {
-    console.log('hi');
+    this.simData = function(){
+        var simPlayernames = undefined;
+        if(this.playernamesChanged)simPlayernames = this.playernames;
+        this.playernamesChanged = false;
+        return {
+            name: this.name,
+            playernames: simPlayernames
+        };
+    }
+    
+    
     return false;
 }
