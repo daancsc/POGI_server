@@ -1,3 +1,8 @@
+var worldWidth = 10000;
+var worldHeight = 10000;
+
+
+
 var camera = {
     position: {
         x: 0,
@@ -12,7 +17,7 @@ function render () {
     background(64); 
     noStroke();
     fill(32);
-    rect(c({x:-5000}).x,c({y:-5000}).y,cs(10000),cs(10000));
+    rect(c({x:-worldWidth*0.5}).x,c({y:-worldHeight*0.5}).y,cs(worldWidth),cs(worldHeight));
     
     fill(70);
     textSize(cs(1000));
@@ -34,19 +39,18 @@ function render () {
     text('在這充滿色彩的爭奪戰，\n'+
          '取得大球的占有權吧!!',c({x:0}).x,c({y:-600}).y);
     
-    if(players[myname]!=undefined){
+    if(players[myid]!=undefined){
         textAlign(CENTER,CENTER);
         textSize(cs(100));
         text('PING伺服器差值：\n'+
-             players[myname].ping,c({x:2000}).x,c({y:0}).y);
+             players[myid].ping,c({x:2000}).x,c({y:0}).y);
         text('PING伺服器差值：\n'+
-             players[myname].ping,c({x:-2000}).x,c({y:0}).y);
+             players[myid].ping,c({x:-2000}).x,c({y:0}).y);
     }
     
     display(bases,pbases);
     display(players,pplayers);
     display(bullets,pbullets);
-    
     
 }
 
@@ -54,33 +58,49 @@ function display(object,pobject){
     
     
     for(i in object){
-        if(pobject[i]!=undefined&&pobject[i].position!=undefined){
-            
-            
-            if(object[i].type=='base'&&object[i].border){
-                fill(0,16); stroke(teams[object[i].team].color); strokeWeight(1);
-                ellipse(c(pobject[i].position).x,c(pobject[i].position).y,cs(object[i].size+600),cs(object[i].size+600));
-            }
-            
-            stroke(0,16); strokeWeight(cs(20));
-            if(object[i].team!=-1) fill(teams[object[i].team].color);
-            else fill(255);
-            ellipse(c(pobject[i].position).x,c(pobject[i].position).y,cs(object[i].size),cs(object[i].size));
-            
-            noStroke();
-            
-            textSize(cs(object[i].size*0.4));
-            fill(255);
-            if(object[i].type=='base'&&object[i].team!=undefined&&teams[object[i].team]!=undefined){
-                text(teams[object[i].team].name,c(pobject[i].position).x,c(pobject[i].position).y);
-                textSize(cs(object[i].size*0.1));
-                text(object[i].size-100,c(pobject[i].position).x,c(pobject[i].position).y+cs(object[i].size*0.3));
-            }
-            textSize(cs(object[i].size*0.4));
-            if(object[i].type=='player'){
-                text(object[i].name, c(pobject[i].position).x, c(pobject[i].position).y);
-                textSize(cs(object[i].size*0.05));
-                text(object[i].size-60,c(pobject[i].position).x,c(pobject[i].position).y+cs(object[i].size*0.3));
+        if(object[i]!=null&&
+            0<    c({x: object[i].position.x+object[i].size*0.5 }).x&& 
+           width> c({x: object[i].position.x-object[i].size*0.5 }).x&& 
+            0<    c({y: object[i].position.y+object[i].size*0.5 }).y&& 
+           height>c({y: object[i].position.y-object[i].size*0.5 }).y){
+            if(pobject[i]!=undefined&&pobject[i].position!=undefined&&pobject[i].life>0){
+
+
+                if(object[i].type=='base'&&object[i].border){
+                    fill(0,16); stroke(teams[object[i].team].color); strokeWeight(1);
+                    ellipse(c(pobject[i].position).x,c(pobject[i].position).y,cs(pobject[i].size+600),cs(pobject[i].size+600));
+                }
+
+                stroke(0,16); strokeWeight(cs(20));
+                if(object[i].team!=-1) fill(teams[object[i].team].color);
+                else fill(255);
+                ellipse(c(pobject[i].position).x,c(pobject[i].position).y,cs(pobject[i].size),cs(pobject[i].size));
+
+                noStroke();
+
+                textSize(cs(object[i].size*0.4));
+                fill(255);
+                if(object[i].type=='base'&&object[i].team!=undefined&&teams[object[i].team]!=undefined){
+                    text(teams[object[i].team].name,c(pobject[i].position).x,c(pobject[i].position).y);
+                    textSize(cs(object[i].size*0.1));
+                    text(Math.round(object[i].size-100),c(pobject[i].position).x,c(pobject[i].position).y+cs(object[i].size*0.3));
+                }
+                textSize(cs(object[i].size*0.4));
+                if(object[i].type=='player'){
+                    text(usernames[i], c(pobject[i].position).x, c(pobject[i].position).y);
+                    textSize(cs(object[i].size*0.05));
+                    text(Math.round(pobject[i].size-60),c(pobject[i].position).x,c(pobject[i].position).y+cs(object[i].size*0.3));
+                }
+
+                if(monitorMode){
+                    stroke(0,255,0);
+                    strokeWeight(1);
+                    fill(0,64);
+                    ellipse(c(object[i].position).x,c(object[i].position).y,cs(object[i].size),cs(object[i].size));
+                    line(c(object[i].position).x,c(object[i].position).y,
+                        c({x:object[i].position.x+object[i].velocity.x*10}).x,
+                        c({y:object[i].position.y+object[i].velocity.y*10}).y);
+                }
             }
         }
     }
@@ -103,6 +123,7 @@ function dc(position){
 function cs(s){
     return s*camera.s;
 }
+
 var what = 0;
 var presskey =[];
 function keyPressed(){
@@ -136,7 +157,9 @@ function keyPressed(){
             if(what==9) what = 10;
             else what = 0;
             break;
-        case 32:
+        case 79:
+            monitorMode = !monitorMode;
+            
     }
     console.log(keyCode+' '+what);
 }

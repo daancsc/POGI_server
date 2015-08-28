@@ -19,6 +19,7 @@ app.use(express.static(__dirname + '/public'));
 var gameCore = (require('./server/game.js').game);
 var game = new gameCore();
 var usernames = {}; //儲存現有user的name
+var ids = 0;
 var AInames = [
     '時時',
     '黑米',
@@ -46,23 +47,29 @@ gameLoop();
 
 function addAI(name){
     
-    while(usernames[name]==name){
-        name = name+(Math.floor(Math.random()*99));
+    var same = true;
+    while(same){
+        same = false;
+        for(i in usernames)if(usernames[i] == name){same=true; break;}
+        if(!same)break;
+        name = 
+            name+(Math.floor(Math.random()*99));
     }
-    usernames[name] = name;
+    usernames[ids] = name;
     
-    var team = game.joinTeam({name: name, AI: true});
+    var team = game.joinTeam({id: ids, AI: true});
     
     io.sockets.emit('user login', {
-        teams: game.teams,
+        id: ids,
+        usernames: usernames,
     });
     
     io.sockets.emit('new join', {
-        username: name,
+        id: ids,
         teams: game.teams,
-        player: game.players[name],
         players: game.players
     });
+    ids++;
 }
 
 for(var i=0;i<0;i++){
@@ -76,33 +83,41 @@ io.on('connection', function (socket) {
     //有新用戶登入時
     socket.on('add user', function (data) {
         
-        while(usernames[data.username]==data.username){
+        var same = true;
+        while(same){
+            same = false;
+            for(i in usernames)if(usernames[i] == data.username){same=true; break;}
+            if(!same)break;
             data.username = 
                 data.username+(Math.floor(Math.random()*99));
         }
         
-        socket.username = data.username;
-        console.log('add user '+socket.username);
-        usernames[data.username] = data.username;
+        //socket.username = data.username;
+        console.log('add user '+data.username);
+        usernames[ids] = data.username;
+        
         addedUser = true;
         
         socket.emit('login', {
-            name: socket.username,
+            id: ids,
             teams: game.teams,
             usernames: usernames
         });
         
         socket.broadcast.emit('user login', {
-            teams: game.teams,
+            id: ids,
+            usernames: usernames,
         });
         
         console.log(
-            'user '+socket.username+' login');
+            'user '+usernames[ids]+' login');
+        
+        ids++;
     });
     
     //有訊息時
     socket.on('join team', function (data) {
-        var team = game.joinTeam({name: data.name, AI: false});
+        var team = game.joinTeam({id: data.id, AI: false});
         
         socket.emit('join', {
             team: team,
@@ -113,70 +128,36 @@ io.on('connection', function (socket) {
         });
         
         socket.broadcast.emit('new join', {
-            username: socket.username,
+            id: data.id,
             teams: game.teams,
             players: game.players
         });
         
         console.log(
-            'user '+socket.username+' join team '+game.teams[team].name);
+            'user '+usernames[data.id]+' join team '+game.teams[team].name);
     });
     
     
     socket.on('update',function (data){
-        if(socket.username == usernames[socket.username]){
-            if(data.name!=undefined&&data.position!=undefined&&game.players[socket.username]!=undefined){
-                game.players[socket.username].setPing();
-                //game.players[socket.username].timeout=0;
-                /*
-                if(game.players[socket.username].ping>2){
-                    var dx = data.position.x-game.players[socket.username].position.x;
-                    var dy = data.position.y-game.players[socket.username].position.y;
-                    var d = Math.sqrt(dx*dx+dy*dy);
-                    var v = Math.sqrt(data.velocity.x*data.velocity.x+data.velocity.x*data.velocity.x);
-                    if(d<v*game.players[socket.username].ping*0.6) game.players[socket.username].position = data.position;
-                    else {
-                        game.players[socket.username].position.x = (game.players[socket.username].position.x+data.position.x)*0.5;
-                        game.players[socket.username].position.y = (game.players[socket.username].position.y+data.position.y)*0.5;
-                    }
-                }*/
-                game.players[socket.username].position = data.position;
-                game.players[socket.username].velocity = data.velocity;
-                game.players[socket.username].what=data.what;
+        if(usernames[data.id]!=undefined){
+            if(game.players[data.id]!=undefined&&!game.forceToMove){
+                game.players[data.id].setPing();
+                game.players[data.id].position = data.position;
+                game.players[data.id].velocity = data.velocity;
+                game.players[data.id].what=data.what;
             }
-            /*
-            if(game.players[socket.username].ping>10&&game.players[socket.username].ping<40){
-                var fastgame = game;
-                for(var i=0;i<10&&i<game.players[socket.username].ping*0.4-1;i++) fastgame.update();
-                socket.emit('update', {
-                    username: socket.username,
-                    usernames: usernames,
-                    players: fastgame.players,
-                    teams: game.teams,
-                    bullets: fastgame.bullets,
-                    bases: fastgame.bases
-                });
-            }else{
-                
-                socket.emit('update', {
-                    username: socket.username,
-                    usernames: usernames,
-                    players: game.players,
-                    teams: game.teams,
-                    bullets: game.bullets,
-                    bases: game.bases
-                });
-            }*/
         }
     });
     
     socket.on('new bullet', function (data) {
-        if(game.players[socket.username].numBullets>0){
-            game.players[socket.username].numBullets--;
-            if(game.players[socket.username].size<500)game.addBullet(game.players[socket.username].team, data.position, data.velocity, 200, 20);
-            else {
-                game.players[socket.username].numBullets-=20;
-                game.addBullet(game.players[socket.username].team, data.position, data.velocity, 200, 100);
+        if(usernames[data.id]!=undefined&&game.players[data.id]!=undefined){
+            if(game.players[data.id].numBullets>0){
+                game.players[data.id].numBullets--;
+                if(game.players[data.id].size<500)game.addBullet(game.players[data.id].team, data.position, data.velocity, 200, 20);
+                else {
+                    game.players[data.id].numBullets-=20;
+                    game.addBullet(game.players[data.id].team, data.position, data.velocity, 200, 100);
+                }
             }
         }
     });
@@ -184,45 +165,42 @@ io.on('connection', function (socket) {
     //隨便示範一個:
     socket.on('new message', function (data) {
         if(data.message[0]=='/'){
-            if(data.message=='/reset') game.reset();
+            if(data.message=='/reset') {
+                game.reset();
+            }
             if(data.message.substring(0,4)=='/say') {
                 socket.emit('new message', { 
-                    name: '[POGI_SERVER]',
+                    id: -1,
                     message: data.message.substring(4)
                 });
 
                 socket.broadcast.emit('new message', {
-                    name: '[POGI_SERVER]',
+                    id: -1,
                     message: data.message.substring(4)
                 });
             }
             if(data.message.substring(0,6)=='/newAi') {
-                addAI(data.message.substring(6));
+                var arg = data.message.substring(6);
+                if(arg[0]===' '){
+                    for(var i=0;i<arg.substring(1)&&i<64;i++){
+                        addAI(AInames[Math.floor(Math.random()*AInames.length)]);
+                    }
+                }else{
+                    addAI(data.message.substring(6));
+                }
+                
             }
         }else{
             socket.emit('new message', { 
-                name: ' '+socket.username,
+                id: data.id,
                 message: data.message,
             });
 
             socket.broadcast.emit('new message', { 
-                name: ' '+socket.username,
+                name: data.id,
                 message: data.message,
             });
         }
-    });
-    
-    socket.on('當發生了事件名稱', function (收到了傳入值) {
-        
-        socket.emit('發布訊息名稱', { //不確定耶..抱歉阿
-            發布內容項目1: "發布內容項目1中的內容",
-            發布內容項目2: "發布內容項目2中的內容",
-        });
-        
-        socket.broadcast.emit('廣播訊息名稱', { //廣播的話反而是所有人看到自己看不到
-            廣播內容項目1: "廣播內容項目1中的內容",
-            廣播內容項目2: "廣播內容項目2中的內容",
-        });
     });
     
     
@@ -240,35 +218,22 @@ io.on('connection', function (socket) {
 var player = require('./server/player.js').player;
 function gameLoop() {
     tick ++;
-    /*
-    for(i in game.players){
-        if(game.players[i]!=undefined&&game.players[i].AI){
-            var aimen = new player('default',-1,{x:0,y:0},true);
-            aimen = game.players[i];
-            var aisays = aimen.AIcalc(game);
-            if(aimen!=undefined&&aimen.numBullets>0&&aisays.shoot!=false){
-                game.addBullet(aimen.team, aisays.shoot.from, aisays.shoot.speed, 100, 20);
-                aimen.numBullets--;
-            }
-            delete aimen;
-        }
-    }
-    */
+    
     game.AImove();
     game.update();
     for(i in game.players){
         if(game.players[i].timeout>500) {
-            var username = game.players[i].name;
-            delete usernames[username];
-            //delete game.teams[game.players[i].team].playernames[username];
+            delete usernames[i];
             delete game.players[i];
+            //delete game.teams[game.players[i].team].playernames[username];
         }
     }
     
     
     
-    if(tick%3==0){
+    if(tick%10==0){
         io.sockets.emit('update', game.simData());
+        game.forceToMove = false;
     }
     //console.log(game.players);
     /*
@@ -278,6 +243,6 @@ function gameLoop() {
         text+= player.name+' '+player.position.x+' , '+player.position.y;
     }
     console.log(text);*/
-    setTimeout(gameLoop, 15);
+    setTimeout(gameLoop, 14);
     return 0;
 }

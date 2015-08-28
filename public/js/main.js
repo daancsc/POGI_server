@@ -6,7 +6,7 @@ var coldTime = 5;
 var updateSpeed = 3;
 var lastPing = 0;
 var messages = [];
-
+var monitorMode = false;
 function closing (){
     socket.emit('disconnect');
 }
@@ -16,6 +16,7 @@ function setup() {
     canvas.parent('processing');
     //canvas.attribute("align", "center");
     frameRate(60);
+    textFont("微軟正黑體");
 }
 
 function windowResized() {
@@ -25,37 +26,37 @@ function windowResized() {
 function draw() {
     if(isJoin) {
         
-        if(frameCount%3==0){
+        if(frameCount%5==0){
             updateData();
-            if(players[myname].ping>lastPing+1&&updateSpeed+1<20) updateSpeed++;
-            else if(players[myname].ping<lastPing-1&&updateSpeed-1>3) updateSpeed--;
-            lastPing=players[myname].ping;
+            if(players[myid].ping>lastPing+1&&updateSpeed+1<20) updateSpeed++;
+            else if(players[myid].ping<lastPing-1&&updateSpeed-1>3) updateSpeed--;
+            lastPing=players[myid].ping;
         }
         calc();
         render();
         fill(255);
         //text("mouse X = "+mouseX+"\n mouse Y = "+mouseY,20,20);
-        if(players[myname]==undefined){
+        if(players[myid]==undefined){
             fill(0,32);
             rect(0,0,width,height);
             text('AUTO LOGOUT',20,20);
         }
         coldTime--;
         if((mousepressed||presskey[32]) &&coldTime<0){
-            if(myname=='火柴最神') coldTime=3;
+            if(myid=='火柴最神') coldTime=3;
             else coldTime=10;
             
             if(what==10){
                 createBullet({
-                    x: players[myname].position.x + Math.random()*players[myname].size*0.3,
-                    y: players[myname].position.y + Math.random()*players[myname].size*0.3
+                    x: players[myid].position.x + Math.random()*players[myid].size*0.3,
+                    y: players[myid].position.y + Math.random()*players[myid].size*0.3
                 },{
                     x: dc({x:mouseX}).x,
                     y: dc({y:mouseY}).y
                 }, 50);
                 coldTime=5;
             }else{
-                createBullet(players[myname].position,{
+                createBullet(players[myid].position,{
                     x: dc({x:mouseX}).x,
                     y: dc({y:mouseY}).y
                 }, 40);
@@ -64,27 +65,30 @@ function draw() {
         }
         textAlign(LEFT,BOTTOM);
         for(i in messages){
-            
-            textSize(20);
+            noStroke();
+            textSize(16);
             fill(255);
-            if(t-messages[messages.length-i-1].time>1000)fill(255,(2000-t-messages[messages.length-i-1].time)*255/1000);
+            if(t-messages[messages.length-i-1].time>1600)fill(255,(2000-t+messages[messages.length-i-1].time)*255/400);
             if(t-messages[messages.length-i-1].time>=2000) noFill(); 
             text(messages[messages.length-i-1].message,20,height-i*30-20);
             if(i>10) break;
         }
+        
+        if(monitorMode)monitor();
+        scoreBoard();
         t++;
     }
 }
 
 function createBullet(from, to, speed){
-    if(players[myname].numBullets>0){
+    if(players[myid].numBullets>0){
         var dx = to.x - from.x;
         var dy = to.y - from.y;
         var dd = Math.sqrt(dx*dx+dy*dy);
         addBullet(
             {
-                x: from.x + dx/dd * players[myname].size*0.6,
-                y: from.y + dy/dd * players[myname].size*0.6
+                x: from.x + dx/dd * players[myid].size*0.6,
+                y: from.y + dy/dd * players[myid].size*0.6
             },
             {
                 x: dx/dd*speed,
@@ -100,13 +104,13 @@ function createBullet(from, to, speed){
 function mousePressed() {
     mousepressed = true;
     /*if(isJoin){
-        var dx = mouseX - c(players[myname].position).x;
-        var dy = mouseY - c(players[myname].position).y;
+        var dx = mouseX - c(players[myid].position).x;
+        var dy = mouseY - c(players[myid].position).y;
         var dd = Math.sqrt(dx*dx+dy*dy);
         addBullet(
             {
-                x: players[myname].position.x,
-                y: players[myname].position.y
+                x: players[myid].position.x,
+                y: players[myid].position.y
             },
             {
                 x: dx/dd*20,

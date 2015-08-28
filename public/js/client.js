@@ -4,11 +4,11 @@ var usernames = {}; //儲存現在有的所有user的name
 
 var teams = [];
 
-var myname = '';
+var myid = undefined;
 var myTeam;
 
-var players = [];
-var pplayers = [];
+var players = {};
+var pplayers = {};
 
 var bullets = [];
 var pbullets = [];
@@ -18,27 +18,30 @@ var pbases = [];
 
 function named () {
     var text = document.getElementById('name');
-    socket.emit('add user',{username: text.value});
+    socket.emit('add user',{
+        username: text.value
+    });
     text.value = '';
 }
 
 function joined () {
     socket.emit('join team',{
-        name: myname,
+        id: myid,
     });
 }
 
 function updateData (){
     socket.emit('update',{
-        name: myname,
-        position: {x: players[myname].position.x, y: players[myname].position.y},
-        velocity: {x: players[myname].velocity.x, y: players[myname].velocity.y},
+        id: myid,
+        position: {x: players[myid].position.x, y: players[myid].position.y},
+        velocity: {x: pplayers[myid].velocity.x, y: pplayers[myid].velocity.y},
         what: what
     });
 }
 
 function addBullet (position, velocity){
     socket.emit('new bullet', {
+        id: myid,
         position: position,
         velocity: velocity
     });
@@ -46,13 +49,13 @@ function addBullet (position, velocity){
 
 function chat () {
     var text = document.getElementById('message');
-    socket.emit('new message',{message: text.value});
+    socket.emit('new message',{id:myid, message: text.value});
     text.value = '';
 }
 socket.on('login', function (data){
-    myname = data.name;
+    myid = data.id;
     teams = data.teams;
-    
+    usernames = data.usernames;
     //updateTeamData();
     
     document.getElementById('loginPage').style.display='none';
@@ -61,8 +64,8 @@ socket.on('login', function (data){
 });
 
 socket.on('user login', function (data){
-    teams = teams;
-    newlog('[有玩家加入了]');
+    usernames = data.usernames;
+    newlog('[玩家 '+usernames[data.id]+' 上線中]');
 });
 
 socket.on('join', function (data){
@@ -70,6 +73,16 @@ socket.on('join', function (data){
     myTeam = data.team;
     teams = data.teams;
     players = data.players;
+    pplayers[myid] = {
+        type: 'player',
+        life: 100,
+        team: data.players[myid].team,
+        size: data.players[myid].size,
+        position: data.players[myid].position,
+        velocity: data.players[myid].velocity,
+        numBullets: data.players[myid].numBullets
+    }
+    //pplayers = data.players;
     bullets = data.bullets;
     bases = data.bases;
     //pplayers = data.players;
@@ -77,7 +90,7 @@ socket.on('join', function (data){
     
     
     document.getElementById("me").innerHTML = 
-        'Name='+myname+'\n'+
+        'id='+myid+'\n'+
         'Team='+myTeam+'\n';
     
     updateGamepage();
@@ -88,30 +101,34 @@ socket.on('join', function (data){
     document.getElementById('processing').style.display='block';
     document.getElementById('chat').style.display='block';
     isJoin=true;
-    newlog('[我 '+myname+' 已加入遊戲]');
+    newlog('[我 '+usernames[myid]+' 已加入遊戲]');
 });
 
 socket.on('new join', function (data){
-    usernames[data.username] = data.username;
-    teams = data.teams;
-    players = data.players;
-    console.log('new user: '+players[data.username].name);
+    //teams = data.teams;
+    //players = data.players;
+    console.log('new user: '+usernames[data.id]);
     
     updateGamepage();
     updateTeamData();
-    newlog('[玩家 '+data.username+' 加入遊戲]');
+    newlog('[玩家 '+usernames[data.id]+' 加入遊戲]');
 });
 
 socket.on('new message', function (data){
-    newlog(data.name +'： '+data.message);
+    if(data.id!=-1)
+        newlog(usernames[data.id] +'：'+data.message);
+    else
+        newlog('[POGI伺服器：'+data.message+']');
 });
 
 socket.on('update', function (data){
     if(isJoin){
         for(i in data.players){//player
             if(players[i]==undefined){
+                monitor_player[i] = 3;
                 players[i]={
                     type: 'player',
+                    life: 100,
                     team: -1,
                     size: 100,
                     position: {x:0, y:0},
@@ -120,31 +137,37 @@ socket.on('update', function (data){
                 };
             }
             if(data.players[i]!=undefined){
+                if(data.players[i].life!=undefined)players[i].life = data.players[i].life;
                 if(data.players[i].ping!=undefined)players[i].ping = data.players[i].ping;
                 if(data.players[i].team!=undefined)players[i].team = data.players[i].team;
                 if(data.players[i].size!=undefined)players[i].size = data.players[i].size;
                 if(data.players[i].position!=undefined)players[i].position = data.players[i].position;
-                if(data.players[i].velocity!=undefined)players[i].velocity = data.players[i].velocity;
+                if(data.players[i].velocity!=undefined){players[i].velocity = data.players[i].velocity; monitor_player[i] = 2;}
                 if(data.players[i].numBullets!=undefined)players[i].numBullets = data.players[i].numBullets;
             }
         }
         for(i in data.dplayers){
+            
             if(players[i]!=undefined) {
+                monitor_player[i] = 4;
                 delete players[i];
-                delete pplayers[i];
-                newlog('[玩家 '+i+' 離開遊戲]');
+                if(pplayers[i]!=undefined)pplayers[i].life = 0;
+                newlog('[玩家 '+usernames[i]+' 離開遊戲]');
             }
         }
         for(i in players){
+            
             if(players[i]!=undefined&&data.players[i]==undefined){
+                monitor_player[i] = 4;
                 delete players[i];
-                delete pplayers[i];
-                newlog('[玩家 '+i+' 離開遊戲]');
+                if(pplayers[i]!=undefined)pplayers[i].life = 0;
+                newlog('[玩家 '+usernames[i]+' 離開遊戲]');
             }
         }
         
         for(i in data.bullets){//bullets
             if(bullets[i]==undefined){
+                monitor_bullet[i]= 3;
                 bullets[i]={
                     type: 'bullet',
                     team: -1,
@@ -154,22 +177,30 @@ socket.on('update', function (data){
                 };
             }
             if(data.bullets[i]!=undefined){
+                if(data.bullets[i].life!=undefined)bullets[i].life = data.bullets[i].life;
                 if(data.bullets[i].team!=undefined)bullets[i].team = data.bullets[i].team;
                 if(data.bullets[i].size!=undefined)bullets[i].size = data.bullets[i].size;
-                if(data.bullets[i].position!=undefined)bullets[i].position = data.bullets[i].position;
                 if(data.bullets[i].velocity!=undefined)bullets[i].velocity = data.bullets[i].velocity;
+                if(data.bullets[i].position!=undefined){
+                    bullets[i].position = data.bullets[i].position;
+                }
+                
+                
             }
         }
         for(i in data.dbullets){
             if(bullets[i]!=undefined) {
+                monitor_bullet[i]= 4;
                 delete bullets[i];
-                delete pbullets[i];
+                if(pbullets[i]!=undefined)pbullets[i].life = 0;
             }
         }
         for(i in bullets){
+            
             if(bullets[i]!=undefined&&data.bullets[i]==undefined){
+                monitor_bullet[i]= 4;
                 delete bullets[i];
-                delete pbullets[i];
+                if(pbullets[i]!=undefined)pbullets[i].life = 0;
             }
         }
         
@@ -185,30 +216,32 @@ socket.on('update', function (data){
                 };
             }
             if(data.bases[i]!=undefined){
+                
+                if(data.bases[i].life!=undefined)bases[i].life = data.bases[i].life;
                 if(data.bases[i].team!=undefined)bases[i].team = data.bases[i].team;
-                if(data.bases[i].size!=undefined)bases[i].size = data.bases[i].size;
+                if(data.bases[i].size!=undefined){bases[i].size = data.bases[i].size; monitor_base[i] = 3;}
                 if(data.bases[i].position!=undefined)bases[i].position = data.bases[i].position;
-                if(data.bases[i].velocity!=undefined)bases[i].velocity = data.bases[i].velocity;
+                if(data.bases[i].velocity!=undefined){bases[i].velocity = data.bases[i].velocity; monitor_base[i] = 3;}
                 if(data.bases[i].border!=undefined)bases[i].border = data.bases[i].border;
             }
         }
         for(i in data.dbases){
             if(bases[i]!=undefined) {
                 delete bases[i];
-                delete pbases[i];
+                if(pbases[i]!=undefined)pbases[i].life = 0;
             }
         }
         for(i in bases){
             if(bases[i]!=undefined&&data.bases[i]==undefined){
                 delete bases[i];
-                delete pbases[i];
+                if(pbases[i]!=undefined)pbases[i].life = 0;
             }
         }
         
         for(i in data.teams){//bases
             if(data.teams[i]!=undefined){
                 if(data.teams[i].name!=undefined)teams[i].name = data.teams[i].name;
-                if(data.teams[i].playernames!=undefined)teams[i].playernames = data.teams[i].playernames;
+                if(data.teams[i].ids!=undefined)teams[i].ids = data.teams[i].ids;
             }
         }
         
@@ -222,8 +255,8 @@ socket.on('update', function (data){
 function updateGamepage(){
     var content = document.getElementById("users");
     var text = '';
-    for(i in players){
-        text+=players[i].name+',';
+    for(i in usernames){
+        text+=usernames[i].name+',';
     }
     content.innerHTML = text;
 }
@@ -239,8 +272,8 @@ function updateTeamData(){
     for(i in content){
         var text = '';
         var num = 0;
-        for(j in teams[i].playernames){
-            text+=teams[i].playernames[j]+', ';
+        for(j in teams[i].ids){
+            text+=teams[i].ids[j]+', ';
             num++;
         }
         content[i].innerHTML = 
@@ -253,4 +286,15 @@ var len = function(list) {
     var out = list.length;
     if(out == undefined) return 0;
     return out;
+}
+
+var length = function(point){
+    return Math.sqrt(point.x*point.x+point.y+point.y);
+}
+
+var sub = function(pointa,pointb){
+    return length({
+        x: pointa.x-pointb.x,
+        y: pointa.y-pointb.y
+    })
 }

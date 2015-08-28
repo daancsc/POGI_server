@@ -1,36 +1,30 @@
-
-
 exports.team = function(name, id, color) {
-    this.playernamesChanged = false;
+    this.idsChanged = true;
     
     this.id = id;
     this.name = name;
     this.color = color;
     
     this.score = 0;
-    this.playernames = {};
+    this.ids = [];
     
-    this.join = function(player) {
-        this.playernamesChanged = true;
-        this.playernames[player.name] = player.name;
+    this.join = function(data) {
+        this.idsChanged = true;
+        this.ids[this.ids.length] = data.id;
         return false;
     }
     
-    this.numPlayers = function() {
-        var out = 0;
-        for(i in this.playernames){
-            out++;
-        }
-        return out;
+    this.numIds = function() {
+        return this.ids.length;
     }
     
     this.simData = function(){
-        var simPlayernames = undefined;
-        if(this.playernamesChanged)simPlayernames = this.playernames;
-        this.playernamesChanged = false;
+        var simIds = undefined;
+        if(this.idsChanged)simIds = this.ids;
+        this.idsChanged = false;
         return {
-            name: this.name,
-            playernames: simPlayernames
+            id: this.id,
+            ids: simIds
         };
     }
     

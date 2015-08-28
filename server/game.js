@@ -11,9 +11,14 @@ var teamDeleteQuene= [];
 
 exports.game = function(){
     this.timeStamp = 0;
+    this.gameStatus = 'wait';
+    
     this.players = {};
     this.bullets = [];
-    this.aiplayplay = {};
+    this.aiplayplay = [];
+    
+    this.forceToMove = false;
+    
     this.bases = [
         new base(0 ,{x: 1500, y: 1500},500),
         new base(1 ,{x: -1500, y: -1500},500),
@@ -41,9 +46,10 @@ exports.game = function(){
     this.joinTeam = function(data){
         var avalibleTeams = [];
         var minNumPlayers = Infinity;
-        for(var i=0;i<this.teams.length;i++){ //找到所有最少人數隊伍
+        for(i in this.teams){ //找到所有最少人數隊伍
+            var thisTeam = this.teams[i];
             if(i!=4){
-                var num = this.teams[i].numPlayers();
+                var num = thisTeam.ids.length;
                 if(num<=minNumPlayers) {
                     if(num<minNumPlayers){
                         avalibleTeams=[];
@@ -55,9 +61,11 @@ exports.game = function(){
         }
         
         var teamId = avalibleTeams[Math.floor(Math.random()*avalibleTeams.length)];
-        console.log('join'+teamId);
+        
         var spawn = {x:0,y:0};
+        
         this.teams[teamId].join(data);
+        
         for(i in this.bases){
             if(this.bases[i].team==teamId){
                 spawn.x=this.bases[i].position.x+Math.random()*10-5;
@@ -65,11 +73,11 @@ exports.game = function(){
             }
         }
         if(data.AI===true){
-            this.players[data.name] = 
-                new player(data.name, teamId, spawn,true);
+            this.players[data.id] = 
+                new player(data.id, teamId, spawn,true);
         }else{
-            this.players[data.name] = 
-                new player(data.name, teamId, spawn,false);
+            this.players[data.id] = 
+                new player(data.id, teamId, spawn,false);
         }
         return teamId;
     }
@@ -174,25 +182,60 @@ exports.game = function(){
     }
     
     this.reset = function(){
+        this.forceToMove = true;
+        
         this.bullets = [];
+        this.timeStamp = 0;
+        this.bullets = [];
+        this.aiplayplay = [];
         this.bases = [
             new base(0 ,{x: 1500, y: 1500},500),
             new base(1 ,{x: -1500, y: -1500},500),
             new base(2 ,{x: 1500, y: -1500},500),
             new base(3 ,{x: -1500, y: 1500},500),
 
-            new base(-1 ,{x: 700, y: 500},200),
-            new base(-1 ,{x: -700, y: -500},200),
-            new base(-1 ,{x: -700, y: 500},200),
-            new base(-1 ,{x: 700, y: -500},200),
+            new base(-1 ,{x: 700, y: 500},150),
+            new base(-1 ,{x: -700, y: -500},150),
+            new base(-1 ,{x: -700, y: 500},150),
+            new base(-1 ,{x: 700, y: -500},150),
         ];
-
+        this.teams = [];
         this.teams = [
             new team('P',0,'#e62d2d'),
             new team('O',1,'#ffce00'),
             new team('G',2,'#48f71e'),
-            new team('I',3,'#1ebaff')
+            new team('I',3,'#1ebaff'),
+            new team('柴',4,'#000')
         ];
+        
+        for(i in this.players){
+            var me = this.players[i];
+            var avalibleTeams = [];
+            var minNumPlayers = Infinity;
+            for(i in this.teams){ //找到所有最少人數隊伍
+                var thisTeam = this.teams[i];
+                if(i!=4){
+                    var num = thisTeam.ids.length;
+                    if(num<=minNumPlayers) {
+                        if(num<minNumPlayers){
+                            avalibleTeams=[];
+                            minNumPlayers=num;
+                        }
+                        avalibleTeams[avalibleTeams.length]=i;
+                    }
+                }
+            }
+            var teamId = avalibleTeams[Math.floor(Math.random()*avalibleTeams.length)];
+            var spawn = {x:0,y:0};
+            for(i in this.bases){
+                if(this.bases[i].team==teamId){
+                    spawn.x=this.bases[i].position.x+Math.random()*10-5;
+                    spawn.y=this.bases[i].position.y+Math.random()*10-5;
+                }
+            }
+            this.teams[me.team].join(i);
+            me.respawn(teamId, spawn);
+        }
     }
     
     this.simData = function(){

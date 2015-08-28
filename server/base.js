@@ -99,7 +99,7 @@ exports.base = function(team, position, size) {
                 var dx= target.position.x-this.position.x;
                 var dy= target.position.y-this.position.y;
                 var dd= Math.sqrt(dx*dx+dy*dy);
-                this.coldTime = 100+(1000-this.size)*2;
+                this.coldTime = 200+(1000-this.size)*0.5;
                 if(this.team==4){
                     this.coldTime= 20;
                     return {
@@ -180,7 +180,7 @@ exports.base = function(team, position, size) {
         var simVelocity = undefined;
         if(Math.abs(this.lastSize-this.size)>10) this.sizeChanged = true;
         this.lastSize = this.size;
-        if(Math.random()<0.6)this.positionChanged = this.velocityChanged;
+        if(this.coldTime%15!=0)this.positionChanged = this.velocityChanged;
         if(this.teamChanged) simTeam = this.team;
         if(this.sizeChanged)simSize = Math.round(this.size);
         if(this.positionChanged)simPosition = {
@@ -200,7 +200,8 @@ exports.base = function(team, position, size) {
             size: simSize,
             position: simPosition,
             velocity: simVelocity,
-            border: this.border
+            border: this.border,
+            life: this.life
         };
     }
     

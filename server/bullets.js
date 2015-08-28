@@ -54,7 +54,7 @@ exports.bullet = function(team, position, velocity, life, size) {
     
     this.collide = function(object){
         var min = (object.size+this.size)*0.5;
-        if(this.team==-1&&object.type=='player') min*=2;
+        if(this.team==-1&&object.type=='player') min+=100;
         if(this.team!=-1&&object.type=='base'&&this.team!=object.team&&object.border) min+=300;
         var distance = {
             x: object.position.x-this.position.x,
@@ -65,10 +65,10 @@ exports.bullet = function(team, position, velocity, life, size) {
                 var d = Math.sqrt(distance.x*distance.x+distance.y*distance.y);
                 if(this.team==-1&&object.type=='player'){
                     var f = 1;
-                    this.velocity.x += f*distance.x/d; this.velocityChanged = true;
-                    this.velocity.y += f*distance.y/d;
+                    this.velocity.x = (this.velocity.x*2 + f*distance.x/d)/3; this.velocityChanged = true;
+                    this.velocity.y = (this.velocity.y*2 + f*distance.y/d)/3;
                     this.changed = true;
-                }else if(d>0&&!(this.team!=-1&&object.type=='base'&&this.team!=object.team&&(object.border&&d<min-40&&this.life>150))){
+                }else if(d>0&&!(this.team!=-1&&object.type=='base'&&this.team!=object.team&&(object.border&&d<min-40&&this.life>180))){
                     var f = d - min;
                     this.velocity.x += f*distance.x/d; this.velocityChanged = true;
                     this.velocity.y += f*distance.y/d;
@@ -86,7 +86,7 @@ exports.bullet = function(team, position, velocity, life, size) {
         var simSize = undefined;
         var simPosition = undefined;
         var simVelocity = undefined;
-        if(Math.random()<0.6)this.positionChanged = this.velocityChanged;
+        if(this.life%10!=0)this.positionChanged = this.velocityChanged;
         if(this.teamChanged) simTeam = this.team;
         if(this.sizeChanged)simSize = Math.round(this.size);
         if(this.positionChanged)simPosition = {
@@ -105,7 +105,8 @@ exports.bullet = function(team, position, velocity, life, size) {
             team: simTeam,
             size: simSize,
             position: simPosition,
-            velocity: simVelocity
+            velocity: simVelocity,
+            life: this.life
         };
     }
     
