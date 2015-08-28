@@ -4,7 +4,7 @@ var monitor_base = [];
 
 function monitor(){
     if(t%5==0) monitorUpdate();
-    var keepW = 10;
+    var keepW = 200;
     keepW += drawSingleMonitor('player',monitor_player,keepW,10,50)+10;
     keepW += drawSingleMonitor('bullet',monitor_bullet,keepW,25,50)+10;
     keepW += drawSingleMonitor('base',monitor_base,    keepW,40,50)+10;
@@ -22,6 +22,8 @@ function displayme(name,x,y){
         ttext += '='+  +'\n';
         ttext += '='+  +'\n';
     }
+    fill(255);
+    noStroke();
     text(ttext,x,y);
 }
 

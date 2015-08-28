@@ -182,7 +182,7 @@ io.on('connection', function (socket) {
             if(data.message.substring(0,6)=='/newAi') {
                 var arg = data.message.substring(6);
                 if(arg[0]===' '){
-                    for(var i=0;i<arg.substring(1)&&i<64;i++){
+                    for(var i=0;i<arg.substring(1)&&i<200;i++){
                         addAI(AInames[Math.floor(Math.random()*AInames.length)]);
                     }
                 }else{

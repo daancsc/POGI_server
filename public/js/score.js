@@ -23,11 +23,11 @@ function scoreUpdate(){
     var hi = 10;
     for(i in teamLeaderBoard){
         if(i==0)
-            hi+=teamLeaderBoard[i].set(10,hi,80,50);
+            hi+=teamLeaderBoard[i].set(10,hi,120,50);
         else if(i==1)
-            hi+=teamLeaderBoard[i].set(10,hi,80,40);
+            hi+=teamLeaderBoard[i].set(10,hi,120,40);
         else
-            hi+=teamLeaderBoard[i].set(10,hi,80,30);
+            hi+=teamLeaderBoard[i].set(10,hi,120,35);
     }
     for(var i = teamLeaderBoard.length-1; i>=0; i--){
         teamLeaderBoard[i].display();

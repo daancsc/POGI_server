@@ -209,31 +209,31 @@ exports.game = function(){
         ];
         
         for(i in this.players){
+            console.log(this.teams);
             var me = this.players[i];
             var avalibleTeams = [];
             var minNumPlayers = Infinity;
-            for(i in this.teams){ //找到所有最少人數隊伍
-                var thisTeam = this.teams[i];
-                if(i!=4){
-                    var num = thisTeam.ids.length;
+            for(j in this.teams){ //找到所有最少人數隊伍
+                var num = this.teams[j].ids.length;
+                if(j!=4){
                     if(num<=minNumPlayers) {
                         if(num<minNumPlayers){
                             avalibleTeams=[];
                             minNumPlayers=num;
                         }
-                        avalibleTeams[avalibleTeams.length]=i;
+                        avalibleTeams[avalibleTeams.length]=j;
                     }
                 }
             }
             var teamId = avalibleTeams[Math.floor(Math.random()*avalibleTeams.length)];
             var spawn = {x:0,y:0};
-            for(i in this.bases){
-                if(this.bases[i].team==teamId){
-                    spawn.x=this.bases[i].position.x+Math.random()*10-5;
-                    spawn.y=this.bases[i].position.y+Math.random()*10-5;
+            for(j in this.bases){
+                if(this.bases[j].team==teamId){
+                    spawn.x=this.bases[j].position.x+Math.random()*10-5;
+                    spawn.y=this.bases[j].position.y+Math.random()*10-5;
                 }
             }
-            this.teams[me.team].join(i);
+            this.teams[teamId].join({id:i});
             me.respawn(teamId, spawn);
         }
     }

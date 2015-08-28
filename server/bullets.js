@@ -10,7 +10,7 @@ exports.bullet = function(team, position, velocity, life, size) {
     this.positionChanged = true;
     this.velocityChanged = true;
     
-    ids=(ids+1)%400;
+    ids=(ids+1)%500;
     this.type = 'bullet';
     this.id = ids;
     this.team = team; this.teamChanged=true;
