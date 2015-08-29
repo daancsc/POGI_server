@@ -23,20 +23,22 @@
     </head>
     
     <body onbeforeunload=closing()>
-        <h1>POGI! 充滿色彩的戰爭</h1>
+        
         
         <div id="processing"></div>
         
         <div id="loginPage">
+            <h1>POGI! 充滿色彩的戰爭</h1>
             <form action="#" onsubmit=named() >
-                enter your name
+                取個綽號吧
                 <input id="name" autocomplete="off" />
             </form>
         </div>
         
         <div id="joinPage">
+            <h1>POGI! 充滿色彩的戰爭</h1>
             <form action="#" onsubmit=joined() >
-                <input type="button" value="JOIN GAME!" onclick=joined() />
+                <input type="button" value="加入遊戲吧" onclick=joined() />
             </form>
         </div>
         
@@ -54,8 +56,8 @@
         </div>
         <div id="chat">
             <form action="#" onsubmit=chat() >
-                <a>聊天框框</a>
-                <input id="message" autocomplete="off" />
+                <a>(T) 訊息：</a>
+                <input id="message" autocomplete="off" onfocus="showchat=true;" onblur="showchat=false"  />
             </form>
         </div>
     </body>

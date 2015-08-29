@@ -8,7 +8,7 @@ var camera = {
         x: 0,
         y: 0,
     },
-    s: 0.2,
+    s: 5,
     ts: 0.6
 }
 
@@ -49,8 +49,16 @@ function render () {
     }
     
     display(bases,pbases);
+    
+    if(!showchat){
+        stroke(255,8);
+        strokeWeight(cs(players[myid].size/cursorSize));
+        line(mouseX,mouseY,c({x:pplayers[myid].position.x}).x,c({y:pplayers[myid].position.y}).y);
+    }
+    
     display(players,pplayers);
     display(bullets,pbullets);
+    
     
 }
 
@@ -59,10 +67,16 @@ function display(object,pobject){
     
     for(i in object){
         if(object[i]!=null&&
-            0<    c({x: object[i].position.x+object[i].size*0.5 }).x&& 
-           width> c({x: object[i].position.x-object[i].size*0.5 }).x&& 
-            0<    c({y: object[i].position.y+object[i].size*0.5 }).y&& 
-           height>c({y: object[i].position.y-object[i].size*0.5 }).y){
+            (
+                (i==myid&&object[i].type=='player')||
+                ( 
+                    0<    c({x: object[i].position.x+object[i].size }).x&& 
+                    width> c({x: object[i].position.x-object[i].size }).x&& 
+                    0<    c({y: object[i].position.y+object[i].size }).y&& 
+                    height>c({y: object[i].position.y-object[i].size }).y
+                )
+            )
+        ){
             if(pobject[i]!=undefined&&pobject[i].position!=undefined&&pobject[i].life>0){
 
 
@@ -126,6 +140,9 @@ function cs(s){
 
 var what = 0;
 var presskey =[];
+
+var reTextbox = false;
+
 function keyPressed(){
     presskey[keyCode] = true;
     switch(keyCode){
@@ -157,9 +174,27 @@ function keyPressed(){
             if(what==9) what = 10;
             else what = 0;
             break;
-        case 79:
-            monitorMode = !monitorMode;
-            
+        case 79://o
+            if(!showchat) monitorMode = !monitorMode;
+            break;
+        case 70://f
+            var fs = fullscreen();
+            if(isJoin&&!showchat)fullscreen(!fs);
+            break;
+        case 84://t
+            if(!showchat){
+                document.getElementById('message').focus();
+                reTextbox=true;
+            }
+            break;
+        case 191:///
+            if(!showchat){
+                document.getElementById('message').focus();
+            }
+            break;
+        case 27:
+            document.getElementById('message').blur();
+            break;
     }
     console.log(keyCode+' '+what);
 }

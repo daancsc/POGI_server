@@ -45,6 +45,15 @@ var AInames = [
 console.log(game.teams);
 gameLoop();
 
+function newIds(){
+    var keep = 0;
+    for(i in usernames){
+        if(keep==i) keep++;
+    }
+    ids = keep;
+}
+
+
 function addAI(name){
     
     var same = true;
@@ -69,7 +78,7 @@ function addAI(name){
         teams: game.teams,
         players: game.players
     });
-    ids++;
+    newIds();
 }
 
 for(var i=0;i<0;i++){
@@ -112,7 +121,7 @@ io.on('connection', function (socket) {
         console.log(
             'user '+usernames[ids]+' login');
         
-        ids++;
+        newIds();
     });
     
     //有訊息時
@@ -197,7 +206,7 @@ io.on('connection', function (socket) {
             });
 
             socket.broadcast.emit('new message', { 
-                name: data.id,
+                id: data.id,
                 message: data.message,
             });
         }

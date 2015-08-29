@@ -12,6 +12,8 @@ var teamDeleteQuene= [];
 exports.game = function(){
     this.timeStamp = 0;
     this.gameStatus = 'wait';
+    this.gameStatusChanged = false;
+    
     
     this.players = {};
     this.bullets = [];
@@ -183,7 +185,9 @@ exports.game = function(){
     
     this.reset = function(){
         this.forceToMove = true;
-        
+        for(i in this.bases){
+            delete this.bases[i];
+        }
         this.bullets = [];
         this.timeStamp = 0;
         this.bullets = [];
@@ -256,6 +260,7 @@ exports.game = function(){
         baseDeleteQuene= [];
         teamDeleteQuene= [];
         return {
+            ftm: this.forceToMove,
             players: simPlayers,
             bullets: simBullets,
             bases: simBases,

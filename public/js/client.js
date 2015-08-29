@@ -16,6 +16,8 @@ var pbullets = [];
 var bases = [];
 var pbases = [];
 
+var ftm = false;
+
 function named () {
     var text = document.getElementById('name');
     socket.emit('add user',{
@@ -39,6 +41,38 @@ function updateData (){
     });
 }
 
+function refreshData(){
+    for(i in bases){
+        if(bases[i]===null){
+            monitor_base[i]=4;
+            delete bases[i];
+            delete pbases[i];
+        }
+    }
+    for(i in players){
+        if(players[i]===null||players[i]==undefined){
+            if(i==myid){
+                console.log('[您因為閒置過久\n(切換至其他畫面導致無法進行伺服器同步計算)\n伺服器已主動將您登出]');
+                isJoin = false;
+                monitor_player[i]=4;
+                players[i]={
+                    type: 'player',
+                    life: 100,
+                    team: -1,
+                    size: 100,
+                    position: {x:0, y:0},
+                    velocity: {x:0, y:0},
+                    numBullets: 100
+                };
+            }else{
+                monitor_player[i]=4;
+                delete players[i];
+                delete pplayers[i];
+            }
+        }
+    }
+}
+
 function addBullet (position, velocity){
     socket.emit('new bullet', {
         id: myid,
@@ -49,9 +83,25 @@ function addBullet (position, velocity){
 
 function chat () {
     var text = document.getElementById('message');
-    socket.emit('new message',{id:myid, message: text.value});
-    text.value = '';
+    if(text.value!=''&&text.value.length<40){
+        socket.emit('new message',{id:myid, message: text.value});
+        text.blur();
+        text.value = '';
+    }
+    else {
+        newlog('[請重新決定您要發送的訊息]');
+    }
+    
 }
+
+function textChanged(){
+    var text = document.getElementById('message');
+    if(reTextbox && text.value=='t'){
+        text.value = '';
+        reTextbox = false;
+    }
+}
+
 socket.on('login', function (data){
     myid = data.id;
     teams = data.teams;
@@ -123,6 +173,7 @@ socket.on('new message', function (data){
 
 socket.on('update', function (data){
     if(isJoin){
+        if(data.ftm!=undefined) ftm = data.ftm;
         for(i in data.players){//player
             if(players[i]==undefined){
                 monitor_player[i] = 3;
@@ -143,7 +194,7 @@ socket.on('update', function (data){
                 if(data.players[i].size!=undefined)players[i].size = data.players[i].size;
                 if(data.players[i].position!=undefined)players[i].position = data.players[i].position;
                 if(data.players[i].velocity!=undefined){players[i].velocity = data.players[i].velocity; monitor_player[i] = 2;}
-                if(data.players[i].numBullets!=undefined)players[i].numBullets = data.players[i].numBullets;
+                if(data.players[i].numBullets!=undefined){players[i].numBullets = data.players[i].numBullets;monitor_player[i] = 3;}
             }
         }
         for(i in data.dplayers){
@@ -157,7 +208,7 @@ socket.on('update', function (data){
         }
         for(i in players){
             
-            if(players[i]!=undefined&&data.players[i]==undefined){
+            if(players[i]!=undefined&&(data.players[i]==undefined||data.players[i]===null)){
                 monitor_player[i] = 4;
                 delete players[i];
                 if(pplayers[i]!=undefined)pplayers[i].life = 0;
@@ -190,15 +241,20 @@ socket.on('update', function (data){
         }
         for(i in data.dbullets){
             if(bullets[i]!=undefined) {
-                monitor_bullet[i]= 4;
+                if(monitor_bullet[i]==4)
+                    monitor_bullet[i]= 2;
+                else monitor_bullet[i]= 4;
                 delete bullets[i];
                 if(pbullets[i]!=undefined)pbullets[i].life = 0;
             }
         }
         for(i in bullets){
             
-            if(bullets[i]!=undefined&&data.bullets[i]==undefined){
-                monitor_bullet[i]= 4;
+            if(bullets[i]!=undefined&&(data.bullets[i]==undefined||data.bullets[i]===null)){
+                if(monitor_bullet[i]==4)
+                    monitor_bullet[i]= 2;
+                else monitor_bullet[i]= 4;
+                
                 delete bullets[i];
                 if(pbullets[i]!=undefined)pbullets[i].life = 0;
             }
@@ -232,7 +288,7 @@ socket.on('update', function (data){
             }
         }
         for(i in bases){
-            if(bases[i]!=undefined&&data.bases[i]==undefined){
+            if(bases[i]!=undefined&&(data.bases[i]==undefined||data.bases[i]===null)){
                 delete bases[i];
                 if(pbases[i]!=undefined)pbases[i].life = 0;
             }

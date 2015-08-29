@@ -7,23 +7,42 @@ var updateSpeed = 3;
 var lastPing = 0;
 var messages = [];
 var monitorMode = false;
+
+var cursorSize = 10;
+
+var showchat = false;
+var chatOffset = 0;
+
 function closing (){
     socket.emit('disconnect');
 }
 
 function setup() {
-    canvas=createCanvas(innerWidth*0.98, innerHeight*0.87);
+    canvas=createCanvas(innerWidth, innerHeight);
     canvas.parent('processing');
     //canvas.attribute("align", "center");
     frameRate(60);
     textFont("微軟正黑體");
+    noCursor();
 }
 
 function windowResized() {
-    resizeCanvas(innerWidth*0.98, innerHeight*0.87);
+    waitress = millis() + 2000;
+    if (fullscreen()) {
+        resizeCanvas(displayWidth, displayHeight);
+//        viewfs.style.display = "none";
+//        exitfs.style.display = "block";
+    } else {
+        resizeCanvas(innerWidth,innerHeight);
+//        exitfs.style.display = "none";
+//        viewfs.style.display = "block";
+    }
+    noCursor();
+    background(0);
 }
 
 function draw() {
+    textChanged();
     if(isJoin) {
         
         if(frameCount%5==0){
@@ -32,19 +51,23 @@ function draw() {
             else if(players[myid].ping<lastPing-1&&updateSpeed-1>3) updateSpeed--;
             lastPing=players[myid].ping;
         }
-        calc();
+        
+        refreshData();
+        if(isJoin)calc();
         render();
+        
         fill(255);
         //text("mouse X = "+mouseX+"\n mouse Y = "+mouseY,20,20);
         if(players[myid]==undefined){
-            fill(0,32);
+            fill(0,64);
             rect(0,0,width,height);
             text('AUTO LOGOUT',20,20);
         }
         coldTime--;
-        if((mousepressed||presskey[32]) &&coldTime<0){
+        if((mousepressed||presskey[32]) && coldTime<0 && players[myid].numBullets>0){
+            cursorSize = 2;
             if(myid=='火柴最神') coldTime=3;
-            else coldTime=10;
+            else coldTime=2;
             
             if(what==10){
                 createBullet({
@@ -62,21 +85,61 @@ function draw() {
                 }, 40);
             }
             
+        }else{
+            cursorSize += (1-cursorSize)*0.3;
         }
-        textAlign(LEFT,BOTTOM);
-        for(i in messages){
+        textAlign(LEFT,CENTER);
+        
+        if(showchat && messages.length>10){
+            var h = Math.min(1,10/messages.length)*270;
+            var y = height-chatOffset/messages.length*270-60;
+                
+            stroke(0);
+            strokeWeight(5);
+            line(10,height-60,10,height-330);
+            
+            stroke(255);
+            line(10,y,10,(y-h));
+        }
+
+        
+        for(var i = 0;i<10&&i<messages.length;i++){
             noStroke();
             textSize(16);
+            
+            if(showchat){
+                fill(0,32);
+                rect(20,height-i*30-71,300,28)
+            }
+            
             fill(255);
-            if(t-messages[messages.length-i-1].time>1600)fill(255,(2000-t+messages[messages.length-i-1].time)*255/400);
-            if(t-messages[messages.length-i-1].time>=2000) noFill(); 
-            text(messages[messages.length-i-1].message,20,height-i*30-20);
-            if(i>10) break;
+            var timeSub = t-messages[messages.length-i-1].time;
+            
+            if(timeSub<20)fill(255,timeSub*255/20);
+            
+            if(!showchat){
+                if(timeSub>1600)fill(255,(2000-timeSub)*255/400);
+                if(timeSub>=2000) noFill(); 
+            }
+            text(messages[messages.length-chatOffset-i-1].message,40,height-i*30-60);
         }
         
         if(monitorMode)monitor();
         scoreBoard();
         t++;
+        
+        
+        if(!showchat){
+            strokeWeight(1);
+            stroke(255);
+            fill(0,16);
+            ellipse(mouseX,mouseY,cs(pplayers[myid].size/cursorSize*0.5),cs(pplayers[myid].size/cursorSize*0.5));
+        }else{
+            strokeWeight(1);
+            stroke(0,16);
+            fill(255);
+            ellipse(mouseX,mouseY,5,5);
+        }
     }
 }
 
@@ -103,22 +166,6 @@ function createBullet(from, to, speed){
 
 function mousePressed() {
     mousepressed = true;
-    /*if(isJoin){
-        var dx = mouseX - c(players[myid].position).x;
-        var dy = mouseY - c(players[myid].position).y;
-        var dd = Math.sqrt(dx*dx+dy*dy);
-        addBullet(
-            {
-                x: players[myid].position.x,
-                y: players[myid].position.y
-            },
-            {
-                x: dx/dd*20,
-                y: dy/dd*20
-            }
-        );
-    }
-    */
 }
 
 function mouseReleased() {
@@ -130,7 +177,10 @@ function mouseWheel(event) {
     //event.delta can be +1 or -1 depending
     //on the wheel/scroll direction
     //move the square one pixel up or down
-    if(0.1<camera.ts+event.delta*0.02&&camera.ts+event.delta*0.02<2)camera.ts+= event.delta*0.02;
+    if(showchat){
+        var change = chatOffset+event.delta;
+        if(0<=change&&change+10<=messages.length) chatOffset = change;
+    }else if(0.1<camera.ts+event.delta*0.02&&camera.ts+event.delta*0.02<2)camera.ts+= event.delta*0.02;
     //uncomment to block page scrolling
     //return false;
 }
@@ -158,17 +208,17 @@ var omitformtags=["input", "textarea", "select"]
 omitformtags=omitformtags.join("|")
 
 function disableselect(e){
-if (omitformtags.indexOf(e.target.tagName.toLowerCase())==-1)
-return false
+    if (omitformtags.indexOf(e.target.tagName.toLowerCase())==-1)
+    return false
 }
 
 function reEnable(){
-return true
+    return true
 }
 
 if (typeof document.onselectstart!="undefined")
-document.onselectstart=new Function ("return false")
+    document.onselectstart=new Function ("return false")
 else{
-document.onmousedown=disableselect
-document.onmouseup=reEnable
+    document.onmousedown=disableselect
+    document.onmouseup=reEnable
 }

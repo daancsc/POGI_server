@@ -1,3 +1,13 @@
+body {
+    display: block;
+    text-align: center ;
+    -ms-user-select: none;
+    font: 20px/1.5 "微軟正黑體","Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #292929;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
 
 #joinPage {
     display: none;
@@ -11,8 +21,16 @@
     display: none;
 }
 
+#chat {
+    font-size: 16px;
+    color: #dddddd;
+    display: none;
+    text-align: left;
+    bottom:20px; left:20px;
+}
+
 div {
-    text-align: center ;
+    position: fixed;
     margin-left: 0;
     margin-right: 0;
     width: 100%;
@@ -23,19 +41,21 @@ div {
     display: none;
 }
 
-#chat {
-    display: none;
-}
-
-body {
-    -ms-user-select: none;
-  font: 20px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background: #888;
-    color: white;
-  padding: 0px 0px;
-    float: left;
-}
-
 h1 {
     font-size: 16px;
+}
+
+canvas {display:block;}    /* remove scrollbars */
+canvas:focus {outline:0;} /* remove blue outline around canvas */
+#message {
+    color: white;
+    outline: 0;
+    border: none;
+    background: rgba(0, 0, 0, 0.3);
+    width: 200px;
+}
+
+#message:focus {
+    border: 1px solid rgb(0, 177, 255);
+    background: #333;
 }

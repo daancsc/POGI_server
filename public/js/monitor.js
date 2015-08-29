@@ -70,16 +70,17 @@ function monitorUpdate(){
             if(players[i].ping>20) sta = 4;
             if(players[i].ping>30) sta = 5;
         }
-        monitor_player[i] = sta;
+        if(monitor_player[i]!=3) monitor_player[i] = sta;
     }
-    /*
+    
     for(i in pbullets){
         var sta = 0;
         if(bullets[i]!=null) sta++;
         if(pbullets[i]!=undefined) {
-            sta++;
-            if(pbullets[i].life<=20) sta = 3;
-            if(pbullets[i].life<=0) sta = 0;
+            if(monitor_bullet[i]==4){
+                if(pbullets[i].life<=20) sta = 3;
+                if(pbullets[i].life<=0) sta = 0;
+            }
         }
         monitor_bullet[i] = sta;
     }
@@ -88,5 +89,5 @@ function monitorUpdate(){
         if(bases[i]!=null) sta++;
         if(pbases[i]!=undefined) sta++;
         monitor_base[i] = sta;
-    }*/
+    }
 }

@@ -9,7 +9,7 @@ function scoreBoard(){
 function scoreUpdate(){
     for(i in teams){
         if(teamLeaderBoard[i]==undefined){
-            teamLeaderBoard[i] = new teamBoard(i,10*i*i*-200,10,10,10);
+            teamLeaderBoard[i] = new teamBoard(i,i*-100,10,10,10);
         }
     }
     
@@ -22,12 +22,7 @@ function scoreUpdate(){
     })
     var hi = 10;
     for(i in teamLeaderBoard){
-        if(i==0)
-            hi+=teamLeaderBoard[i].set(10,hi,120,50);
-        else if(i==1)
-            hi+=teamLeaderBoard[i].set(10,hi,120,40);
-        else
-            hi+=teamLeaderBoard[i].set(10,hi,120,35);
+        hi+=teamLeaderBoard[i].set(10,hi,120,35);
     }
     for(var i = teamLeaderBoard.length-1; i>=0; i--){
         teamLeaderBoard[i].display();
@@ -60,24 +55,35 @@ function teamBoard(team,x,y,w,h){
         this.ty = y;
         this.tw = w;
         this.th = h;
-        return h+10;
+        return this.h+10;
     }
     this.display = function(){
         if(this.score>0){
-            this.x+=(this.tx-this.x)*0.2;
-            this.y+=(this.ty-this.y)*0.2;
-            this.w+=(this.tw-this.w)*0.2;
-            this.h+=(this.th-this.h)*0.2;
-            strokeWeight(4);
-            stroke(0,32);
-            fill(teams[this.team].color);
-            rect(this.x,this.y,this.w,this.h);
-            strokeWeight(1);
-            stroke(0,64);
+            this.x+=(this.tx-this.x)*0.1;
+            this.y+=(this.ty-this.y)*0.1;
+            this.w+=(this.tw-this.w)*0.1;
+            this.h+=(this.th-this.h)*0.1;
+            
+            noStroke();
+            fill(0,32);
+            rect(this.x-5,this.y-5,this.w+10,this.h+10);
             fill(255);
-            textAlign(CENTER,CENTER);
+            rect(this.x,this.y,this.w,this.h);
+            fill(teams[this.team].color);
+            rect(this.x,this.y,this.w*0.5,this.h);
+            noStroke();
+            
+            fill(255);
             textSize(this.h*0.75);
-            text(this.score,this.x+this.w*0.5,this.y+this.h*0.5);
+            textAlign(CENTER,CENTER);
+            text(teams[this.team].name,this.x+this.w*0.25,this.y+this.h*0.5);
+            
+            noStroke();
+            fill(teams[this.team].color);
+            fill(64);
+            textSize(this.h*0.5);
+            textAlign(CENTER,CENTER);
+            text(this.score,this.x+this.w*0.75,this.y+this.h*0.5);
         }
     }
 }
