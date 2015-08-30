@@ -51,9 +51,18 @@ function render () {
     display(bases,pbases);
     
     if(!showchat){
-        stroke(255,8);
-        strokeWeight(cs(players[myid].size/cursorSize));
-        line(mouseX,mouseY,c({x:pplayers[myid].position.x}).x,c({y:pplayers[myid].position.y}).y);
+        if(!isMobile){
+            stroke(255,8);
+            strokeWeight(cs(players[myid].size/cursorSize));
+            line(mouseX,mouseY,c({x:pplayers[myid].position.x}).x,c({y:pplayers[myid].position.y}).y);
+        }else{
+            stroke(255,8);
+            strokeWeight(cs(players[myid].size/cursorSize));
+            line(c({x:pplayers[myid].position.x+ctrlGoPoint.x}).x,
+                 c({y:pplayers[myid].position.y+ctrlGoPoint.y}).y,
+                 c({x:pplayers[myid].position.x}).x,
+                 c({y:pplayers[myid].position.y}).y);
+        }
     }
     
     display(players,pplayers);
@@ -138,6 +147,10 @@ function cs(s){
     return s*camera.s;
 }
 
+function dcs(s){
+    return s/camera.s;
+}
+
 var what = 0;
 var presskey =[];
 
@@ -185,6 +198,11 @@ function keyPressed(){
             if(!showchat){
                 document.getElementById('message').focus();
                 reTextbox=true;
+            }
+            break;
+        case 13://t
+            if(!showchat){
+                document.getElementById('message').focus();
             }
             break;
         case 191:///

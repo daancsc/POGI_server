@@ -26,6 +26,10 @@ exports.base = function(team, position, size) {
     this.border = false;
     this.lastSize = 100;
     
+    this.scoreHelp = 0;
+    this.scoreAttack = 0;
+    this.scoreCapture = 0;
+    
     this.update = function() {
         this.coldTime--;
         this.foodTime--;
@@ -82,6 +86,7 @@ exports.base = function(team, position, size) {
         }
         return false;
     }
+    
     this.clearTargets = function(){
         targets = [];
         return false;
@@ -133,8 +138,6 @@ exports.base = function(team, position, size) {
         
     }
     
-    
-    
     this.findTarget = function(object){
         if(Object.team!=this.team){
             var min = this.size*2;
@@ -153,7 +156,6 @@ exports.base = function(team, position, size) {
         return false;
     }
     
-    
     this.food = function(){
         
         if(this.foodTime<0){
@@ -164,14 +166,20 @@ exports.base = function(team, position, size) {
     }
     
     this.addball = function(object){
-        if(this.size<=100){ this.team = object.team; this.teamChanged=true;}
-        if(object.team==this.team) {this.size+=object.size/5; this.sizeChanged=true; }
-        else if(this.size>100){
-            this.size-=object.size/5; this.sizeChanged=true; 
-            if(this.size<=100){ this.team = -1; this.teamChanged=true;}
+        if(this.size<=100){ 
+            this.team = object.team; this.teamChanged=true; object.owner.scoreCapture++;
+        }
+        
+        if(object.team==this.team) {
+            this.size+=object.size/5; this.sizeChanged=true; object.owner.scoreHelp++;
+        }else if(this.size>100){
+            this.size-=object.size/5; this.sizeChanged=true; object.owner.scoreAttack++;
+            
+            if(this.size<=100){
+                this.team = -1; this.teamChanged=true;
+            }
         }
     }
-    
     
     this.simData = function (){
         var simTeam = undefined;

@@ -133,7 +133,8 @@ io.on('connection', function (socket) {
             teams: game.teams,
             players: game.players,
             bullets: game.bullets,
-            bases: game.bases
+            bases: game.bases,
+            gameStatus: game.gameStatus
         });
         
         socket.broadcast.emit('new join', {
@@ -162,10 +163,10 @@ io.on('connection', function (socket) {
         if(usernames[data.id]!=undefined&&game.players[data.id]!=undefined){
             if(game.players[data.id].numBullets>0){
                 game.players[data.id].numBullets--;
-                if(game.players[data.id].size<500)game.addBullet(game.players[data.id].team, data.position, data.velocity, 200, 20);
+                if(game.players[data.id].size<500)game.addBullet(game.players[data.id], game.players[data.id].team, data.position, data.velocity, 200, 20);
                 else {
                     game.players[data.id].numBullets-=20;
-                    game.addBullet(game.players[data.id].team, data.position, data.velocity, 200, 100);
+                    game.addBullet(game.players[data.id], game.players[data.id].team, data.position, data.velocity, 200, 100);
                 }
             }
         }
@@ -212,7 +213,6 @@ io.on('connection', function (socket) {
         }
     });
     
-    
     socket.on('disconnect', function () {
 
         if (addedUser) {
@@ -238,20 +238,10 @@ function gameLoop() {
         }
     }
     
-    
-    
     if(tick%10==0){
         io.sockets.emit('update', game.simData());
         game.forceToMove = false;
     }
-    //console.log(game.players);
-    /*
-    var text='';
-    for(i in game.players){
-        var player = game.players[i];
-        text+= player.name+' '+player.position.x+' , '+player.position.y;
-    }
-    console.log(text);*/
     setTimeout(gameLoop, 14);
     return 0;
 }

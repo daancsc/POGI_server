@@ -11,9 +11,10 @@ var teamDeleteQuene= [];
 
 exports.game = function(){
     this.timeStamp = 0;
-    this.gameStatus = 'wait';
-    this.gameStatusChanged = false;
     
+    this.gameTimer = 500;
+    this.gameStatus = 'ready';
+    this.gameStatusChanged = true;
     
     this.players = {};
     this.bullets = [];
@@ -85,7 +86,27 @@ exports.game = function(){
     }
     
     this.update = function(){
-        
+        this.gameTimer--;
+        if(this.gameTimer<0){
+            switch(this.gameStatus){
+                case 'play':
+                    this.gameTimer=900;//900
+                    this.gameStatus='final';
+                    this.gameStatusChanged = true;
+                    break;
+                case 'final':
+                    this.gameTimer=180;//180
+                    this.gameStatus='ready';
+                    this.gameStatusChanged = true;
+                    break;
+                case 'ready':
+                    this.reset();
+                    this.gameTimer=7200;//7200
+                    this.gameStatus='play';
+                    this.gameStatusChanged = true;
+                    break;
+            }
+        }
         
         for(i in this.players){
             for(j in this.players) if(i!=j)this.players[i].collide(this.players[j]);
@@ -112,8 +133,8 @@ exports.game = function(){
             for(j in this.bases) if(i!=j) if(this.bases[i].findTarget(this.bases[j]));
             var shoot = this.bases[i].shoot();
             if(shoot.shoot) {
-                if(this.bases[i].team==4) this.addBullet(shoot.team, shoot.position, shoot.velocity, 50, 20);
-                else this.addBullet(shoot.team, shoot.position, shoot.velocity, 200, 20);
+                if(this.bases[i].team==4) this.addBullet(this.bases[i], shoot.team, shoot.position, shoot.velocity, 50, 20);
+                else this.addBullet(this.bases[i], shoot.team, shoot.position, shoot.velocity, 200, 20);
             }
             
             if(this.bases[i].team!=-1){
@@ -151,16 +172,14 @@ exports.game = function(){
             }
         }
         
-        
-        
-        
-        
         return false;
     }
     
-    this.addBullet = function (team, position, velocity, life, size) {
-        var newBullet = new bullet(team, position, velocity, life, size);
-        this.bullets[newBullet.id] = newBullet;
+    this.addBullet = function (who, team, position, velocity, life, size) {
+        if(this.gameStatus=='play'){
+            var newBullet = new bullet(who, team, position, velocity, life, size);
+            this.bullets[newBullet.id] = newBullet;
+        }
     }
     
     this.addBase = function (team, position, size) {
@@ -174,7 +193,7 @@ exports.game = function(){
             var size = object.size*0.5+100;
             var angle = Math.random()*Math.PI*2;
             for(var i=0;i<amount;i++){
-                this.addBullet(-1,{
+                this.addBullet(object , -1,{
                     x: position.x + Math.cos(angle)*size,
                     y: position.y + Math.sin(angle)*size
                 }, {x: 0, y: 0}, 150, 1);
@@ -213,7 +232,6 @@ exports.game = function(){
         ];
         
         for(i in this.players){
-            console.log(this.teams);
             var me = this.players[i];
             var avalibleTeams = [];
             var minNumPlayers = Infinity;
@@ -233,8 +251,8 @@ exports.game = function(){
             var spawn = {x:0,y:0};
             for(j in this.bases){
                 if(this.bases[j].team==teamId){
-                    spawn.x=this.bases[j].position.x+Math.random()*10-5;
-                    spawn.y=this.bases[j].position.y+Math.random()*10-5;
+                    spawn.x=this.bases[j].position.x+Math.random()*1000-500;
+                    spawn.y=this.bases[j].position.y+Math.random()*1000-500;
                 }
             }
             this.teams[teamId].join({id:i});
@@ -247,10 +265,20 @@ exports.game = function(){
         var simBullets = {};
         var simBases = {};
         var simTeams = {};
+        var simGameStatus = undefined;
+        var simGameTimer = undefined;
+        var simGameScore = undefined;
         for(i in this.players) simPlayers[i] = this.players[i].simData();
         for(i in this.bullets) simBullets[i] = this.bullets[i].simData();
         for(i in this.bases) simBases[i] = this.bases[i].simData();
         for(i in this.teams) simTeams[i] = this.teams[i].simData();
+        if(this.gameStatusChanged) simGameStatus = this.gameStatus;
+        
+            simGameTimer = this.gameTimer;
+        
+       if((this.gameStatus=='play')||(this.gameStatus=='final'&&this.gameStatusChanged)){
+           simGameScore = this.gameScore();
+       }
         var playerDelete = playerDeleteQuene;
         var bulletDelete = bulletDeleteQuene;
         var baseDelete = baseDeleteQuene;
@@ -259,17 +287,71 @@ exports.game = function(){
         bulletDeleteQuene= [];
         baseDeleteQuene= [];
         teamDeleteQuene= [];
+        this.gameStatusChanged = false;
         return {
             ftm: this.forceToMove,
+            
             players: simPlayers,
             bullets: simBullets,
             bases: simBases,
             teams: simTeams,
+            gameStatus: simGameStatus,
+            gameTimer: simGameTimer,
+            gameScore: simGameScore,
+            
             dplayers: playerDelete,
             dbullets: bulletDelete,
             dbases: baseDelete,
             dteams: teamDelete,
         };
+    }
+    
+    this.gameScore = function(){
+        var simPlayers = {};
+        
+        var maxSize = -1;
+        var maxAttack = -1;
+        var maxHelp = -1;
+        var maxCapture = -1;
+        
+        var maxSizePlayer = [];
+        var maxAttackPlayer = [];
+        var maxHelpPlayer = [];
+        var maxCapturePlayer = [];
+        
+        for(i in this.players) {
+            simPlayers[i] = this.players[i].playerScore();
+            var get =addMax(maxSize     , i, simPlayers[i].size     , maxSizePlayer     );
+            maxSize = get.max;      maxSizePlayer = get.list;
+            
+            get =    addMax(maxAttack   , i, simPlayers[i].attack   , maxAttackPlayer   );
+            maxAttack = get.max;      maxAttackPlayer = get.list;
+            
+            get =    addMax(maxHelp     , i, simPlayers[i].help     , maxHelpPlayer     );
+            maxHelp = get.max;      maxHelpPlayer = get.list;
+            
+            get =    addMax(maxCapture  , i, simPlayers[i].capture  , maxCapturePlayer  );
+            maxCapture = get.max;      maxCapturePlayer = get.list;
+        }
+        
+        return {
+            size:{
+                max: maxSize,
+                list: maxSizePlayer
+            },
+            attack:{
+                max: maxAttack,
+                list: maxAttackPlayer
+            },
+            help:{
+                max: maxHelp,
+                list: maxHelpPlayer
+            },
+            capture:{
+                max: maxCapture,
+                list: maxCapturePlayer
+            }
+        }
     }
     
     this.AImove = function(){
@@ -284,8 +366,8 @@ exports.game = function(){
                 var aisays = this.aiplayplay[i].calc(aimen,this);
                 aimen.move(aisays);
                 if(aimen!=undefined&&aimen.numBullets>0&&aisays.shoot!=false){
-                    if(aimen.size>500) this.addBullet(aimen.team, aisays.shoot.from, aisays.shoot.speed, 100, 100);
-                    else this.addBullet(aimen.team, aisays.shoot.from, aisays.shoot.speed, 100, 20);
+                    if(aimen.size>500) this.addBullet(aimen, aimen.team, aisays.shoot.from, aisays.shoot.speed, 100, 100);
+                    else this.addBullet(aimen, aimen.team, aisays.shoot.from, aisays.shoot.speed, 100, 20);
                     aimen.numBullets--;
                 }
                 delete aimen;
@@ -293,4 +375,19 @@ exports.game = function(){
         }
     }
     return false;
+}
+
+function addMax(maxValue, tryObj, tryValue, outList){
+    if(tryValue>=maxValue){
+        if(tryValue>maxValue){
+            maxValue = tryValue;
+            outList = [];
+        }
+        outList[outList.length]=tryObj;
+    }
+    
+    return {
+        max: maxValue,
+        list: outList
+    };
 }

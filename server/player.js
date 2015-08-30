@@ -28,6 +28,11 @@ exports.player = function(id, team, position, AI) {
     this.timeloop = 0;
     //this.AIplayplay = new AIBRAIN();
     
+    this.scoreHelp = 0;
+    this.scoreAttack = 0;
+    this.scoreCapture = 0;
+
+    
     this.update = function(){       
         this.timeloop ++;
         
@@ -84,11 +89,13 @@ exports.player = function(id, team, position, AI) {
                         this.numBullets+=1; this.sizeChanged=true; this.numBulletsChanged=true;
                         this.velocity.x += object.velocity.x/this.size*0.01*object.size; velocityChanged = true;
                         this.velocity.y += object.velocity.y/this.size*0.01*object.size;
+                        object.owner.scoreHelp++;
                     }
                     else if(object.team!=this.team&&this.numBullets>0) {
                         this.numBullets-=object.size/4; this.sizeChanged=true; this.numBulletsChanged=true;
                         this.velocity.x += object.velocity.x/this.size*object.size; velocityChanged = true;
                         this.velocity.y += object.velocity.y/this.size*object.size;
+                        object.owner.scoreAttack++;
                     }
                     if(!(object.team==this.team&&object.life>=190)) object.life = 0;
                 }
@@ -128,8 +135,10 @@ exports.player = function(id, team, position, AI) {
         this.life = 100;
         this.size = 60;             this.sizeChanged = true;
         this.numBullets = 100;      this.numBulletsChanged = true;
+        this.scoreHelp = 0;
+        this.scoreAttack = 0;
+        this.scoreCapture = 0;
     }
-    
     
     this.simData = function(){
         var simTeam = undefined;
@@ -142,12 +151,12 @@ exports.player = function(id, team, position, AI) {
         if(this.teamChanged) simTeam = this.team;
         if(this.sizeChanged)simSize = Math.round(this.size);
         if(this.positionChanged)simPosition = {
-            x: Math.round(this.position.x*5)/5,
-            y: Math.round(this.position.y*5)/5
+            x: Math.round(this.position.x),
+            y: Math.round(this.position.y)
         };
         if(this.velocityChanged)simVelocity = {
-            x: Math.round(this.velocity.x*5)/5,
-            y: Math.round(this.velocity.y*5)/5
+            x: Math.round(this.velocity.x),
+            y: Math.round(this.velocity.y)
         };
         if(this.numBulletsChanged||this.lastNumBullets!=this.numBullets){
             simSize = Math.round(this.size);
@@ -171,6 +180,14 @@ exports.player = function(id, team, position, AI) {
         };
     }
     
+    this.playerScore = function(){
+        return {
+            size: this.numBullets,
+            help: this.scoreHelp,
+            attack: this.scoreAttack,
+            capture: this.scoreCapture
+        };
+    }
     
     this.move = function (aisay){
         //var aisay = this.AIplayplay.calc(this,game);

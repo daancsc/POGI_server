@@ -17,6 +17,27 @@ var bases = [];
 var pbases = [];
 
 var ftm = false;
+var gameTimer = 0;
+var gameStatus = '';
+
+var gameScore = {
+    size:{
+        max: 0,
+        list: []
+    },
+    attack:{
+        max: 0,
+        list: []
+    },
+    help:{
+        max: 0,
+        list: []
+    },
+    capture:{
+        max: 0,
+        list: []
+    }
+};
 
 function named () {
     var text = document.getElementById('name');
@@ -96,7 +117,7 @@ function chat () {
 
 function textChanged(){
     var text = document.getElementById('message');
-    if(reTextbox && text.value=='t'){
+    if(reTextbox &&( text.value=='t'||text.value=='T')){
         text.value = '';
         reTextbox = false;
     }
@@ -135,6 +156,8 @@ socket.on('join', function (data){
     //pplayers = data.players;
     bullets = data.bullets;
     bases = data.bases;
+    
+    gameStatus = data.gameStatus;
     //pplayers = data.players;
     console.log('join');
     
@@ -174,6 +197,12 @@ socket.on('new message', function (data){
 socket.on('update', function (data){
     if(isJoin){
         if(data.ftm!=undefined) ftm = data.ftm;
+        if(data.gameTimer!=undefined) gameTimer = data.gameTimer;
+        if(data.gameStatus!=undefined) gameStatus = data.gameStatus;
+        if(data.gameScore!=undefined){
+            gameScore = data.gameScore;
+        }
+        
         for(i in data.players){//player
             if(players[i]==undefined){
                 monitor_player[i] = 3;

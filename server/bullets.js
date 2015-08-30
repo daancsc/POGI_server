@@ -4,14 +4,16 @@ var worldHeight = 10000;
 
 
 var ids = 0;
-exports.bullet = function(team, position, velocity, life, size) {
+exports.bullet = function(who, team, position, velocity, life, size) {
     this.teamChanged = true;
     this.sizeChanged = true;
     this.positionChanged = true;
     this.velocityChanged = true;
     
     ids=(ids+1)%500;
+
     this.type = 'bullet';
+    this.owner = who;
     this.id = ids;
     this.team = team; this.teamChanged=true;
     this.position = position;

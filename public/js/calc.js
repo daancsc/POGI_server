@@ -1,23 +1,34 @@
 function calc () {
-    camera.position.x += ((pplayers[myid].position.x*2+dc({x:mouseX}).x)/3 - camera.position.x)*0.05;
-    camera.position.y += ((pplayers[myid].position.y*2+dc({y:mouseY}).y)/3 - camera.position.y)*0.05;
-    camera.s += (camera.ts - camera.s) *0.05;
+    camera.position.x += ((pplayers[myid].position.x*2+dc({x:mouseX}).x)/3 - camera.position.x)*0.2;
+    camera.position.y += ((pplayers[myid].position.y*2+dc({y:mouseY}).y)/3 - camera.position.y)*0.2;
+    camera.s += (camera.ts - camera.s) *0.2;
     if(!showchat){
-        var dx = mouseX - c(players[myid].position).x;
-        var dy = mouseY - c(players[myid].position).y;
-        var dd = Math.sqrt(dx*dx+dy*dy);
-
-        if(dd>100){
-            pplayers[myid].velocity.x = (pplayers[myid].velocity.x+dx/dd*5)*0.75;
-            pplayers[myid].velocity.y = (pplayers[myid].velocity.y+dy/dd*5)*0.75;
-            if(what==10){
-                pplayers[myid].velocity.x += dx/dd*10;
-                pplayers[myid].velocity.y += dy/dd*10;
+        if(!isMobile){
+            var dx = mouseX - c(players[myid].position).x;
+            var dy = mouseY - c(players[myid].position).y;
+            var dd = Math.sqrt(dx*dx+dy*dy);
+            if(dd>100){
+                pplayers[myid].velocity.x = (pplayers[myid].velocity.x+dx/dd*5)*0.75;
+                pplayers[myid].velocity.y = (pplayers[myid].velocity.y+dy/dd*5)*0.75;
+                if(what==10){
+                    pplayers[myid].velocity.x += dx/dd*10;
+                    pplayers[myid].velocity.y += dy/dd*10;
+                }
+            }else{
+                pplayers[myid].velocity.x *= 0.8;
+                pplayers[myid].velocity.y *= 0.8;
             }
         }else{
+            console.log(ctrlGoPoint);
+            pplayers[myid].velocity.x = ctrlGoPoint.x;
+            pplayers[myid].velocity.y = ctrlGoPoint.y;
+            
             pplayers[myid].velocity.x *= 0.8;
             pplayers[myid].velocity.y *= 0.8;
         }
+        
+
+        
 
 
         if(presskey[87]) pplayers[myid].velocity.y = (pplayers[myid].velocity.y-5)*0.75;
@@ -92,7 +103,6 @@ var animated = function(object,pobject){
         
     }
 }
-
 
 var movingUpdate = function(object){
     if(object.position.x<-worldWidth*0.5+object.size*0.5) {
