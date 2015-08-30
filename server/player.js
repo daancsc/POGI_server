@@ -182,7 +182,7 @@ exports.player = function(id, team, position, AI) {
     
     this.playerScore = function(){
         return {
-            size: this.numBullets,
+            size: Math.round(this.numBullets),
             help: this.scoreHelp,
             attack: this.scoreAttack,
             capture: this.scoreCapture

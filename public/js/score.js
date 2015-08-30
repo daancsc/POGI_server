@@ -106,15 +106,18 @@ function teamBoard(team,x,y,w,h){
     
     this.update = function(){
         this.score = teamSum(this.team);
-        this.players = [];
+        this.playersList = [];
         this.playerLength = 0;
+        var findTeam = this.team;
         for(i in players){
-            if(players[i].team == this.team){
+            var nowPlayer = players[i]
+            if(nowPlayer.team == findTeam){
                 this.playerLength ++;
                 this.playersList[this.playersList.length] = i;
             }
         }
     }
+    
     this.set = function(x,y,w,h){
         this.tx = x;
         this.ty = y;
@@ -125,10 +128,14 @@ function teamBoard(team,x,y,w,h){
         else return this.w+10;
     }
     this.scroll = function(delta){
-        if((this.x<mouseX&&mouseX<this.x+this.w&&this.y<mouseY&&mouseY<this.y+this.h)){
-            var change = this.listOffset-delta*2;
-            if(0<=change&&change+9<this.playerLength) this.listOffset = change;
-        }
+        if(this.playerLength>10){
+            if((this.x<mouseX&&mouseX<this.x+this.w&&this.y<mouseY&&mouseY<this.y+this.h)){
+                var change = this.listOffset-delta*2;
+                if(0<=change&&change+9<this.playerLength) this.listOffset = change;
+                else if(0>change) this.listOffset = 0;
+                else if(change+9>=this.playerLength) this.listOffset = this.playerLength-10;
+            }
+        } else this.listOffset = 0;
     }
     this.display = function(){
         if((this.x<mouseX&&mouseX<this.x+this.w&&this.y<mouseY&&mouseY<this.y+this.h)){
@@ -171,8 +178,8 @@ function teamBoard(team,x,y,w,h){
             var scoreText = this.score;
             
             if(this.bigMode){
-                teamText = '基地'+teamText;
-                scoreText = '積分'+scoreText;
+                teamText = teamText+' team';
+                scoreText = '積分 '+scoreText;
             }
             
             
@@ -220,12 +227,12 @@ function teamBoard(team,x,y,w,h){
             var h = Math.min(1,10/this.playerLength)*200;
             var y = this.listOffset/this.playerLength*200+this.y+70;
 
-            stroke(64);
+            stroke(80);
             strokeWeight(5);
             line(this.x+10,this.y+70,this.x+10,this.y+70+200);
             
             strokeWeight(5);
-            stroke(200);
+            stroke(196);
             line(this.x+10,y,this.x+10,(y+h));
         }
     }
@@ -268,13 +275,18 @@ function awsomeBoard(name,x,y,w,h){
     }
     
     this.scroll = function(delta){
-        if((this.x<mouseX&&mouseX<this.x+this.w&&this.y<mouseY&&mouseY<this.y+this.h)){
-            var change = this.listOffset-delta*2;
-            if(0<=change&&change+3<this.list.length) this.listOffset = change;
-        }
+        if(this.list.length>3){
+            if((this.x<mouseX&&mouseX<this.x+this.w&&this.y<mouseY&&mouseY<this.y+this.h)){
+                var change = this.listOffset-delta*1;
+                if(0<=change&&change+2<this.list.length) this.listOffset = change;
+                else if(0>change) this.listOffset = 0;
+                else if(change+2>=this.list.length) this.listOffset = this.list.length-3;
+            }
+        }else this.listOffset = 0;
     }
     
     this.display = function(){
+        
         if((this.x<mouseX&&mouseX<this.x+this.w&&this.y<mouseY&&mouseY<this.y+this.h)){
             if(gameStatus=='final'){
                 this.bigMode = true;
@@ -287,7 +299,7 @@ function awsomeBoard(name,x,y,w,h){
         }else this.bigMode = false;
         
         if(true){
-            var bigHeight = Math.min(this.list.length,10)*20+this.th*2+20;
+            var bigHeight = Math.min(this.list.length,3)*20+this.th*2+20;
             this.x+=(this.tx-this.x)*0.1;
             this.y+=(this.ty-this.y)*0.1;
             
@@ -343,26 +355,37 @@ function awsomeBoard(name,x,y,w,h){
             if(this.bigMode){
                 var lines = 0;
                 textSize(16);
-                for(var i = 0;i<10&&i<this.list.length;i++){
+                for(var i = 0;i<3&&i<this.list.length;i++){
+                    noStroke();
+                    if(players[this.list[i+this.listOffset]]!=undefined){
+                        if(teams[players[this.list[i+this.listOffset]].team]!=undefined){
+                            fill(teams[players[this.list[i+this.listOffset]].team].color);
+                            rect(this.x,this.y+this.th*2.5+lines*20-10,5*this.colorWidth,20);
+                        }
+                    }
+                    
                     textAlign(LEFT,CENTER);
+                    fill(0);
+                    
                     var playerText = nf(i+this.listOffset+1,2)+' '+usernames[this.list[i+this.listOffset]];
                     text(playerText,this.x+this.w*(this.colorWidth*0.1),this.y+this.th*2.5+lines*20);
+                    
                     lines++;
                 }
             }
+        }
+        
+        if(this.bigMode && this.list.length>3){
+            var h = Math.min(1,3/this.list.length)*60;
+            var y = this.listOffset/this.list.length*60+this.y+70;
+
+            stroke(80);
+            strokeWeight(5);
+            line(this.x+10,this.y+70,this.x+10,this.y+70+60);
             
-            if(this.bigMode && this.list.length>10){
-                var h = Math.min(1,10/this.list.length)*200;
-                var y = this.listOffset/this.list.length*200+this.y+70;
-
-                stroke(64);
-                strokeWeight(5);
-                line(this.x+10,this.y+70,this.x+10,this.y+70+200);
-
-                strokeWeight(5);
-                stroke(200);
-                line(this.x+10,y,this.x+10,(y+h));
-            }
+            strokeWeight(5);
+            stroke(196);
+            line(this.x+10,y,this.x+10,(y+h));
         }
     }
 }

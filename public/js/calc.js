@@ -7,7 +7,7 @@ function calc () {
             var dx = mouseX - c(players[myid].position).x;
             var dy = mouseY - c(players[myid].position).y;
             var dd = Math.sqrt(dx*dx+dy*dy);
-            if(dd>100){
+            if(dd>200){
                 pplayers[myid].velocity.x = (pplayers[myid].velocity.x+dx/dd*5)*0.75;
                 pplayers[myid].velocity.y = (pplayers[myid].velocity.y+dy/dd*5)*0.75;
                 if(what==10){

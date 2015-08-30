@@ -11,8 +11,8 @@ var worldHeight = 10000;
 exports.base = function(team, position, size) {
     this.teamChanged = false;
     this.sizeChanged = false;
-    this.positionChanged = false;
-    this.velocityChanged = false;
+    this.positionChanged = true;
+    this.velocityChanged = true;
     
     this.type = 'base';
     this.id = ids;ids=(ids+1)%200;

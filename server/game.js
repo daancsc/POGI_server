@@ -101,7 +101,7 @@ exports.game = function(){
                     break;
                 case 'ready':
                     this.reset();
-                    this.gameTimer=7200;//7200
+                    this.gameTimer=18000;//7200
                     this.gameStatus='play';
                     this.gameStatusChanged = true;
                     break;

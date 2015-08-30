@@ -187,6 +187,7 @@ var timerToPlace = {
         w: 280,
         h: 35
     };
+
 function timer(){
     
     gameTimer-=0.9;
@@ -194,27 +195,32 @@ function timer(){
     if(smoothGameTimer<0)smoothGameTimer = 0;
     var second = Math.floor(smoothGameTimer/60);
     var minute = Math.floor(second/60);
-    second%=60;
 
-    gametime = nf(minute,2)+'：'+nf(second,2);
+    gametime = nf(minute,2)+'：'+nf(second%60,2);
 
-    
-    var gameStatusText = '倒數計時器，請注意時間';
+    noStroke();
+    var gameStatusText = '';
+    strokeWeight(3);
     switch(gameStatus){
         case 'play':
             gameStatusText = '對戰吧，佔領敵人的基地!  '+gametime;
+            if(second<=60) gameStatusText = '最後 '+second+' 秒';
+            if(second<=10){
+                '倒數 '+second+' 秒!';
+                if(second%2==0) stroke('#e83535');
+            }
             timerToPlace.w= gameStatusText.length*16+20;
             timerToPlace.x= width-timerToPlace.w-20;
             timerToPlace.y= 50;
             break;
         case 'final':
-            gameStatusText = '分數統計，你玩得怎樣呢? 下一場將在'+gametime+'後開始';
+            gameStatusText = '分數統計，你玩得怎樣呢? 下一場將在 '+second+' 秒後開始';
             timerToPlace.w= width*0.618;
             timerToPlace.x= width*0.192;
             timerToPlace.y= height*0.192;
             break;
         case 'ready':
-            gameStatusText = '準備傳送並重新開始遊戲...  ' + gametime;
+            gameStatusText = '準備傳送並重新開始遊戲...  ' + second;
             timerToPlace.w= width;
             timerToPlace.x= 0;
             timerToPlace.y= height*0.5-35*0.5;
@@ -229,9 +235,9 @@ function timer(){
     timerPlace.h += (timerToPlace.h-timerPlace.h)*0.2;
     
     fill(255);
-    noStroke();
-    rect(timerPlace.x,timerPlace.y,timerPlace.w,timerPlace.h);
     
+    rect(timerPlace.x,timerPlace.y,timerPlace.w,timerPlace.h);
+    noStroke();
     textSize(16);
     textAlign(CENTER,CENTER);
     fill(0);

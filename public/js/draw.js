@@ -95,14 +95,22 @@ function display(object,pobject){
                 }
 
                 stroke(0,16); strokeWeight(cs(20));
-                if(object[i].team!=-1) fill(teams[object[i].team].color);
-                else fill(255);
+                if(object[i].type=='base'){
+                    ellipse(c(pobject[i].position).x,c(pobject[i].position).y,cs(pobject[i].size),cs(pobject[i].size));
+                    strokeWeight(cs(10));
+                    stroke(255);
+                }
+                    if(object[i].team!=-1) fill(teams[object[i].team].color);
+                    else fill(255);
+                if(object[i].type=='player'&&object[i].numBullets<=0) fill(255,192);
                 ellipse(c(pobject[i].position).x,c(pobject[i].position).y,cs(pobject[i].size),cs(pobject[i].size));
 
                 noStroke();
-
+                
                 textSize(cs(object[i].size*0.4));
+                
                 fill(255);
+                
                 if(object[i].type=='base'&&object[i].team!=undefined&&teams[object[i].team]!=undefined){
                     text(teams[object[i].team].name,c(pobject[i].position).x,c(pobject[i].position).y);
                     textSize(cs(object[i].size*0.1));
