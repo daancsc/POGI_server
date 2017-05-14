@@ -1,2 +1,2 @@
-# POGI_server
-a ball pushing game server
+# POGI
+a ball shooting game
